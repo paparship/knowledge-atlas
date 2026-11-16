@@ -208,6 +208,14 @@
       "type": "parent-child",
       "label": "",
       "status": "draft"
+    },
+    {
+      "id": "flow-to-save-restore",
+      "source": "rpg-data-driven-story",
+      "target": "flow-save-restore",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
     }
   ],
   "positions": {
