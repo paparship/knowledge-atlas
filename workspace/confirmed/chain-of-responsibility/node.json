@@ -1,0 +1,12 @@
+{
+  "id": "chain-of-responsibility",
+  "title": "责任链模式",
+  "updatedAt": "2026-11-15T07:29:27.836Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

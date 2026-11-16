@@ -1,0 +1,51 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><div id="scene-batching">
+  <div class="viz-controls">
+    <button class="btn" id="sb-all" aria-pressed="true">一次全部创建</button>
+    <button class="btn" id="sb-chunk" aria-pressed="false">分块、分帧创建</button>
+  </div>
+  <div class="viz-row sb-row"><button class="btn btn-primary" id="sb-play">播放</button><button class="btn" id="sb-step">下一步</button><span class="text-muted">12 个物体 · 慢动作模拟</span></div>
+  <div class="sb-row" aria-live="polite" id="sb-task">主线程：准备创建 12 个物体</div>
+  <div class="sb-work" id="sb-work" role="img" aria-label="主线程已创建的物体数量"></div>
+  <div class="viz-row sb-row"><span id="sb-count" class="tabular-nums">已创建 0 / 12</span><span id="sb-phase">尚未开始</span></div>
+  <hr>
+  <div class="viz-row sb-row"><h3>用户实际看到的画面</h3><span id="sb-refresh" class="text-muted tabular-nums">更新 0 次</span></div>
+  <div class="card sb-screen" role="img" aria-label="页面上的场景物体" id="sb-screen"></div>
+</div>
+<style>
+#scene-batching .sb-row{margin-top:calc(var(--font-size-base)*1)}
+#scene-batching .sb-work{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:4px;margin-top:calc(var(--font-size-base)*.5)}
+#scene-batching .sb-unit{height:12px;background:var(--muted)}
+#scene-batching .sb-unit.done{background:var(--viz-series-1)}
+#scene-batching .sb-screen{margin-top:calc(var(--font-size-base)*.5);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:calc(var(--font-size-base)*.8);padding:calc(var(--font-size-base)*1);min-height:200px}
+#scene-batching .sb-object{display:flex;align-items:center;justify-content:center;min-height:46px;background:color-mix(in srgb,var(--viz-series-1) 18%,transparent);color:var(--foreground);opacity:0}
+#scene-batching .sb-object.shown{opacity:1}
+#scene-batching hr{margin-top:calc(var(--font-size-base)*1)}
+</style>
+<script>
+(()=>{
+const root=document.getElementById('scene-batching'),q=id=>root.querySelector('#'+id);
+let mode='all',index=0,timer=null;
+function sequence(m){let result=[{built:0,shown:0,refresh:0,task:'准备创建 12 个物体',phase:'尚未开始'}],shown=0,refresh=0;
+for(let n=1;n<=12;n++){
+result.push({built:n,shown,refresh,task:'创建物体 '+n,phase:m==='all'?'长任务仍未结束，画面不能更新':'第 '+Math.ceil(n/3)+' 批：创建 3 个物体'});
+if(m==='chunk'&&n%3===0||m==='all'&&n===12){shown=n;refresh++;result.push({built:n,shown,refresh,task:'本批构建结束 → 更新并显示画面',phase:n===12?'全部完成': '本帧显示 '+n+' 个，下帧继续下一批'});}}
+return result;}
+let states=sequence(mode);
+q('sb-work').innerHTML=Array.from({length:12},()=>'<span class="sb-unit"></span>').join('');
+q('sb-screen').innerHTML=Array.from({length:12},(_,i)=>'<div class="sb-object">物体 '+(i+1)+'</div>').join('');
+function draw(){const s=states[index];q('sb-task').textContent='主线程：'+s.task;q('sb-count').textContent='已创建 '+s.built+' / 12';q('sb-phase').textContent=s.phase;q('sb-refresh').textContent='更新 '+s.refresh+' 次';
+root.querySelectorAll('.sb-unit').forEach((e,i)=>e.classList.toggle('done',i<s.built));root.querySelectorAll('.sb-object').forEach((e,i)=>e.classList.toggle('shown',i<s.shown));q('sb-screen').setAttribute('aria-label','用户画面上显示 '+s.shown+' 个物体');q('sb-work').setAttribute('aria-label','主线程已创建 '+s.built+' 个物体');q('sb-play').textContent=timer?'暂停':index===states.length-1?'重播':'播放';q('sb-step').disabled=index===states.length-1;
+q('sb-all').setAttribute('aria-pressed',String(mode==='all'));q('sb-chunk').setAttribute('aria-pressed',String(mode==='chunk'));}
+function stop(){clearInterval(timer);timer=null;}
+function persist(){window.openai?.setWidgetState?.({modelContent:{mode},privateContent:{index}})?.catch(()=>{});}
+function next(){if(index<states.length-1)index++;if(index===states.length-1)stop();draw();}
+q('sb-play').onclick=()=>{if(timer)stop();else{if(index===states.length-1)index=0;timer=setInterval(next,750);}draw();persist();};
+q('sb-step').onclick=()=>{stop();next();persist();};
+for(const m of ['all','chunk'])q('sb-'+m).onclick=()=>{stop();mode=m;index=0;states=sequence(mode);draw();persist();};
+function restore(s){if(!s)return;stop();mode=s.modelContent?.mode==='chunk'?'chunk':'all';states=sequence(mode);index=Math.max(0,Math.min(states.length-1,Number(s.privateContent?.index)||0));draw();}
+restore(window.openai?.widgetState);window.addEventListener('openai:set_globals',e=>{if(e.detail?.globals?.widgetState)restore(e.detail.globals.widgetState);});draw();
+})();
+</script>
+<style>
+:root{--font-size-base:14px;--foreground:#243047;--muted:#e9edf3;--viz-series-1:#285dce}*{box-sizing:border-box}body{margin:0;padding:16px;font:14px/1.5 system-ui,'Microsoft YaHei',sans-serif;color:var(--foreground)}button{font:inherit;cursor:pointer}.btn{padding:5px 10px;border:1px solid #ccd5e2;border-radius:6px;background:#fff;color:var(--foreground)}.btn-primary,.btn[aria-pressed=true]{background:#285dce;color:white;border-color:#285dce}.btn:disabled{opacity:.45;cursor:default}.viz-controls,.viz-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.text-muted{color:#64748b}.tabular-nums{font-variant-numeric:tabular-nums}h3{font-size:14px;font-weight:600;margin:0}hr{border:0;border-top:1px solid #e0e6ef}.card{background:#f6f8fc;border:1px solid #e0e6ef;border-radius:6px}#scene-batching .sb-screen{min-height:150px}#scene-batching .sb-object{min-height:32px}#scene-batching .sb-row{margin-top:8px}
+</style></html>

@@ -1,0 +1,12 @@
+{
+  "id": "web-session-identity",
+  "title": "会话与身份认证",
+  "updatedAt": "2026-11-15T10:34:46.974Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

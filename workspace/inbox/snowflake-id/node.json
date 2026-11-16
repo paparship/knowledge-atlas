@@ -1,0 +1,12 @@
+{
+  "id": "snowflake-id",
+  "title": "雪花算法",
+  "updatedAt": "2026-11-15T14:00:39.051Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>知识图谱</title><link rel="stylesheet" href="/style.css"></head>
+<body>
+<aside class="sidebar">
+  <button id="newNode" class="primary wide">＋ 新建知识节点</button>
+  <label class="search"><input id="search" placeholder="搜索标题与内容" aria-label="搜索节点"><kbd>/</kbd></label>
+  <nav class="filters" aria-label="筛选节点"><button data-filter="all" class="active">全部节点 <span id="allCount">0</span></button><button data-filter="draft">未整理区 <span id="draftCount">0</span></button><button data-filter="confirmed">正式记录 <span id="confirmedCount">0</span></button></nav>
+  <div class="list-title"><div>节点 <span id="listCount"></span></div><div class="view-switch" role="group" aria-label="节点视图"><button data-view="list" aria-pressed="false">列表</button><button data-view="tree" aria-pressed="true">树形</button></div></div>
+  <div id="nodeList" class="node-list"></div>
+  <footer><span class="online-dot"></span><span id="sync">已连接本地工作区</span><button id="reload" title="重新载入">↻</button></footer>
+</aside>
+<main>
+  <header class="graph-header">
+    <div class="graph-heading"><h1 id="scopeTitle">全部节点</h1><span id="graphStats">正在读取工作区…</span></div>
+    <div class="graph-actions"><label class="neighbor"><input id="neighbors" type="checkbox"> 只看相邻节点</label><button id="help">操作说明</button></div>
+  </header>
+  <section class="stage">
+    <canvas id="graph" aria-label="三维知识图谱，使用左侧节点列表可通过键盘选择节点"></canvas>
+    <div class="graph-empty" id="graphEmpty" hidden>暂无节点<br><small>点击「新建知识节点」添加。</small></div>
+  </section>
+  <div class="graph-toolbar">
+    <div class="legend"><span title="略大的节点表示总览">● 总览</span><span><i class="draft-dot"></i>未整理</span><span><i class="confirmed-dot"></i>已确认</span></div>
+    <div class="graph-controls"><div class="zoom-controls" aria-label="图谱视角" role="group"><button id="zoomOut" title="缩小" aria-label="缩小">−</button><button id="resetView">复位视角</button><button id="zoomIn" title="放大" aria-label="放大">＋</button></div><button id="hierarchyLayout" title="按总览与子章节重新排列节点">层级排布</button><button id="saveLayout">保存布局</button></div>
+  </div>
+</main>
+<div id="detailResize" role="separator" aria-label="调整预览宽度" aria-orientation="vertical" aria-controls="detail" tabindex="0" title="拖动调整预览宽度"></div>
+<aside id="detail" class="detail" hidden></aside>
+<dialog id="modal"><div id="modalBody"></div></dialog><div id="toast" role="status"></div>
+<script src="/prism.js" data-manual></script><script type="module" src="/app.js"></script></body></html>

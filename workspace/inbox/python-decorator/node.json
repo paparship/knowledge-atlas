@@ -1,0 +1,12 @@
+{
+  "id": "python-decorator",
+  "title": "Python：装饰器语法",
+  "updatedAt": "2026-11-14T16:09:45.291Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

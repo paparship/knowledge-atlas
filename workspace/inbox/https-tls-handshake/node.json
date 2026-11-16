@@ -1,0 +1,12 @@
+{
+  "id": "https-tls-handshake",
+  "title": "HTTPS 与 TLS 握手",
+  "updatedAt": "2026-11-15T10:34:47.170Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

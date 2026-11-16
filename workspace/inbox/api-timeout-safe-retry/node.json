@@ -1,0 +1,12 @@
+{
+  "id": "api-timeout-safe-retry",
+  "title": "有副作用的接口超时后怎么处理",
+  "updatedAt": "2026-11-13T16:17:58.743Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

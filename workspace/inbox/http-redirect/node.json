@@ -1,0 +1,12 @@
+{
+  "id": "http-redirect",
+  "title": "重定向",
+  "updatedAt": "2026-11-15T10:34:47.138Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

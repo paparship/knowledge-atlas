@@ -1,0 +1,12 @@
+{
+  "id": "web-development",
+  "title": "Web 开发",
+  "updatedAt": "2026-11-15T11:22:09.580Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

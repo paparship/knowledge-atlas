@@ -1,0 +1,12 @@
+{
+  "id": "rpg-data-driven-story",
+  "title": "数据驱动的流程建模",
+  "updatedAt": "2026-11-16T11:14:02.906Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

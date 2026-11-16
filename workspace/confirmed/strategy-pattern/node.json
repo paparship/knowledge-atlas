@@ -1,0 +1,12 @@
+{
+  "id": "strategy-pattern",
+  "title": "策略模式",
+  "updatedAt": "2026-11-14T17:40:41.539Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

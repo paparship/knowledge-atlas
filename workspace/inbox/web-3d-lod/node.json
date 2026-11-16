@@ -1,0 +1,12 @@
+{
+  "id": "web-3d-lod",
+  "title": "Web 3D：LOD",
+  "updatedAt": "2026-11-16T07:33:14.023Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

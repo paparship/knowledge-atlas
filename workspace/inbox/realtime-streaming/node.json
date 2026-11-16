@@ -1,0 +1,12 @@
+{
+  "id": "realtime-streaming",
+  "title": "客户端与服务端交互方式",
+  "updatedAt": "2026-11-15T11:22:09.542Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

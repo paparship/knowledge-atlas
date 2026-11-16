@@ -1,0 +1,17 @@
+{
+  "id": "http-connection-animation",
+  "title": "HTTP/1.0 到 HTTP/3 的连接与传输",
+  "updatedAt": "2026-11-13T17:13:50.793Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    },
+    {
+      "id": "demo",
+      "format": "html",
+      "file": "demo.html"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "template-method-pattern",
+  "title": "模板方法模式",
+  "updatedAt": "2026-11-14T17:40:41.625Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

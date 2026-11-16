@@ -1,0 +1,12 @@
+{
+  "id": "web-worker",
+  "title": "Web Worker",
+  "updatedAt": "2026-11-15T14:55:46.541Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

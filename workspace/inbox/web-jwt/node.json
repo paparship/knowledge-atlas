@@ -1,0 +1,12 @@
+{
+  "id": "web-jwt",
+  "title": "JWT 身份凭证",
+  "updatedAt": "2026-11-15T10:34:47.231Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

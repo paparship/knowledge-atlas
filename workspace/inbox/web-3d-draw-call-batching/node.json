@@ -1,0 +1,12 @@
+{
+  "id": "web-3d-draw-call-batching",
+  "title": "Web 3D：Draw call 与合批",
+  "updatedAt": "2026-11-16T07:55:27.841Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

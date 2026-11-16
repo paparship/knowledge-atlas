@@ -1,0 +1,12 @@
+{
+  "id": "web-session-browser-storage",
+  "title": "会话与浏览器存储",
+  "updatedAt": "2026-11-15T10:34:47.200Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

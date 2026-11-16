@@ -1,0 +1,12 @@
+{
+  "id": "http-and-transport",
+  "title": "HTTP 与传输",
+  "updatedAt": "2026-11-15T10:52:05.482Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "http-negotiation-compression",
+  "title": "内容协商与压缩",
+  "updatedAt": "2026-11-15T10:34:47.101Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

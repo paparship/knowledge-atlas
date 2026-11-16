@@ -1,0 +1,12 @@
+{
+  "id": "simple-factory",
+  "title": "工厂模式",
+  "updatedAt": "2026-11-14T17:40:41.520Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

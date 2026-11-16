@@ -1,0 +1,12 @@
+{
+  "id": "web-3d-frustum-culling",
+  "title": "Web 3D：视锥剔除",
+  "updatedAt": "2026-11-16T07:38:12.419Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

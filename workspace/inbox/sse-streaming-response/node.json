@@ -1,0 +1,12 @@
+{
+  "id": "sse-streaming-response",
+  "title": "SSE",
+  "updatedAt": "2026-11-15T13:46:16.715Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "backend-rpc-grpc",
+  "title": "后端：RPC 与 gRPC",
+  "updatedAt": "2026-11-15T13:26:53.679Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

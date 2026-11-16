@@ -1,0 +1,12 @@
+{
+  "id": "image-sensor-to-compression",
+  "title": "图像：从传感器测量到压缩格式",
+  "updatedAt": "2026-11-15T08:38:43.376Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

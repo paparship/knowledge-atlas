@@ -1,0 +1,12 @@
+{
+  "id": "http-cache",
+  "title": "缓存",
+  "updatedAt": "2026-11-15T10:34:47.038Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

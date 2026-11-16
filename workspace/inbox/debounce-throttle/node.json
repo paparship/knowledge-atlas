@@ -1,0 +1,17 @@
+{
+  "id": "debounce-throttle",
+  "title": "防抖与节流",
+  "updatedAt": "2026-11-15T14:31:32.034Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    },
+    {
+      "id": "animation",
+      "format": "html",
+      "file": "animation.html"
+    }
+  ]
+}

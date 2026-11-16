@@ -1,0 +1,29 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><style>
+*{box-sizing:border-box}body{margin:0;padding:16px;color:#243047;background:#fff;font:14px/1.5 system-ui,'Microsoft YaHei',sans-serif}button{font:inherit;cursor:pointer;border:1px solid #ccd6e5;border-radius:6px;padding:5px 12px;background:white;color:#243047}button.active,button.primary{background:#2458ca;color:white;border-color:#2458ca}.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}h3{font-size:16px;margin:12px 0 4px}.muted{color:#64748b;font-size:12px}.status{margin:10px 0;padding:8px 10px;background:#eff4ff;border-radius:6px;min-height:58px}.track{position:relative;margin:8px 20px 8px 70px;height:112px;border-left:1px solid #cbd5e1;border-right:1px solid #cbd5e1;background:repeating-linear-gradient(to right,transparent 0,transparent calc(100% / 14 - 1px),#edf1f6 calc(100% / 14 - 1px),#edf1f6 calc(100% / 14))}.lane{position:absolute;left:0;right:0;border-top:1px solid #cbd5e1}.input{top:28px}.output{top:78px}.name{position:absolute;right:calc(100% + 10px);top:-11px;white-space:nowrap}.dot{position:absolute;top:-6px;width:11px;height:11px;transform:translateX(-50%);border-radius:50%;background:#d4dce9}.dot.done{background:#2458ca}.dot.fire{background:#d97706}.dot span{position:absolute;top:10px;left:50%;transform:translateX(-50%);font-size:10px;color:#64748b}.cursor{position:absolute;top:0;bottom:0;width:2px;background:#25354f;pointer-events:none}.deadline{position:absolute;top:48px;height:42px;border-left:2px dashed #d97706}.axis{display:flex;justify-content:space-between;margin-left:70px;margin-right:16px;font-size:11px;color:#64748b}.foot{margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}#log{margin-top:8px;font-size:12px;color:#475569;min-height:20px}
+.dot{font-style:normal}.input .dot:nth-child(even) span{top:-22px}</style><div class="bar"><button id="debounce" class="active">防抖</button><button id="throttle">节流</button><span class="muted">间隔 300 ms</span></div><h3 id="heading"></h3><div class="status"><strong id="clock">尚未开始</strong><div id="status"></div></div><div class="track" id="track"><div class="lane input"><span class="name">用户输入</span><div id="inputs"></div></div><div class="lane output"><span class="name">实际执行</span><div id="outputs"></div></div></div><div class="axis"><span>0 ms</span><span>700 ms</span><span>1400 ms</span></div><div class="foot"><button class="primary" id="play">播放</button><button id="step">下一事件</button><button id="reset">重置</button></div><div id="log"></div><script>
+const times=[0,100,200,300,800,900],words=['a','ab','abc','abcd','abcde','abcdef'];let mode='debounce',t=-10,deadline=null,last=-Infinity,latest='',fires=[],message='',running=false,raf=0,wall=0,carry=0;
+const $=id=>document.getElementById(id);
+function paint(){
+ $('heading').textContent=mode==='debounce'?'每次输入都重置等待时间':'立即执行，然后冷却 300 ms';
+ $('clock').textContent=t<0?'尚未开始':t+' ms';$('status').textContent=message;
+ $('inputs').innerHTML=times.map((x,i)=>'<i class="dot '+(x<=t?'done':'')+'" style="left:'+x/14+'%"><span>'+x+'</span></i>').join('');
+ $('outputs').innerHTML=fires.map(f=>'<i class="dot fire" style="left:'+f.time/14+'%"><span>'+f.time+'</span></i>').join('');
+ document.querySelectorAll('.cursor,.deadline').forEach(e=>e.remove());
+ if(t>=0){let c=document.createElement('div');c.className='cursor';c.style.left=t/14+'%';$('track').append(c);}
+ if(deadline!==null){let c=document.createElement('div');c.className='deadline';c.style.left=deadline/14+'%';$('track').append(c);}
+ $('log').textContent=fires.length?'已执行：'+fires.map(f=>f.time+' ms 搜索「'+f.word+'」').join('；'):'';
+ $('play').textContent=running?'暂停':t>=1400?'重新播放':'播放';
+}
+function tick(){t+=10;let i=times.indexOf(t);
+ if(mode==='throttle'&&deadline===t){deadline=null;message='冷却结束，可以接受下一次输入。';}
+ if(i>=0){latest=words[i];if(mode==='debounce'){let old=deadline;deadline=t+300;message='输入「'+latest+'」：'+(old===null?'开始等待':'取消原定 '+old+' ms 的执行')+'，改为 '+deadline+' ms 执行。';}else if(t-last>=300){last=t;deadline=t+300;fires.push({time:t,word:latest});message='输入「'+latest+'」：立即执行，冷却到 '+deadline+' ms。';}else message='输入「'+latest+'」：仍在冷却，忽略本次触发，不延长冷却。';}
+ if(mode==='debounce'&&deadline===t){fires.push({time:t,word:latest});deadline=null;message='已连续 300 ms 没有输入，执行搜索「'+latest+'」。';}
+ if(t>=1400){running=false;message='播放结束：共执行 '+fires.length+' 次。';}paint();
+}
+function stop(){running=false;cancelAnimationFrame(raf);}
+function reset(){stop();t=-10;deadline=null;last=-Infinity;latest='';fires=[];message=mode==='debounce'?'观察输入如何把橙色执行期限向后推迟。':'观察冷却期间的输入被忽略，期限保持不变。';paint();}
+function frame(now){if(!running)return;carry+=(now-wall)*.2;wall=now;while(carry>=10&&running){carry-=10;tick();}if(running)raf=requestAnimationFrame(frame);}
+for(const m of ['debounce','throttle'])$(m).onclick=()=>{mode=m;for(const n of ['debounce','throttle'])$(n).classList.toggle('active',n===mode);reset();};
+ $('play').onclick=()=>{if(running){stop();paint();return;}if(t>=1400)reset();running=true;wall=performance.now();carry=0;paint();raf=requestAnimationFrame(frame);};
+ $('reset').onclick=reset;$('step').onclick=()=>{stop();if(t>=1400){paint();return;}let next=Math.min(...[...times.filter(x=>x>t),...(deadline!==null&&deadline>t?[deadline]:[]),1400]);while(t<next)tick();paint();};reset();
+</script></html>

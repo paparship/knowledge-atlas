@@ -1,0 +1,12 @@
+{
+  "id": "backend-microservices",
+  "title": "后端：微服务",
+  "updatedAt": "2026-11-15T13:35:37.455Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

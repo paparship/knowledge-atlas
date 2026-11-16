@@ -1,0 +1,359 @@
+{
+  "schemaVersion": 1,
+  "edges": [
+    {
+      "id": "design-patterns-to-python-singleton",
+      "source": "design-patterns",
+      "target": "python-singleton",
+      "label": "",
+      "status": "confirmed",
+      "type": "parent-child"
+    },
+    {
+      "id": "design-patterns-to-simple-factory",
+      "source": "design-patterns",
+      "target": "simple-factory",
+      "label": "",
+      "status": "confirmed",
+      "type": "parent-child"
+    },
+    {
+      "id": "design-patterns-to-strategy-pattern",
+      "source": "design-patterns",
+      "target": "strategy-pattern",
+      "label": "",
+      "status": "confirmed",
+      "type": "parent-child"
+    },
+    {
+      "id": "design-patterns-to-proxy-pattern",
+      "source": "design-patterns",
+      "target": "proxy-pattern",
+      "label": "",
+      "status": "confirmed",
+      "type": "parent-child"
+    },
+    {
+      "id": "design-patterns-to-decorator-pattern",
+      "source": "design-patterns",
+      "target": "decorator-pattern",
+      "label": "",
+      "status": "confirmed",
+      "type": "parent-child"
+    },
+    {
+      "id": "design-patterns-to-observer-pattern",
+      "source": "design-patterns",
+      "target": "observer-pattern",
+      "label": "",
+      "status": "confirmed",
+      "type": "parent-child"
+    },
+    {
+      "id": "design-patterns-to-template-method-pattern",
+      "source": "design-patterns",
+      "target": "template-method-pattern",
+      "label": "",
+      "status": "confirmed",
+      "type": "parent-child"
+    },
+    {
+      "id": "design-patterns-to-chain-of-responsibility",
+      "source": "design-patterns",
+      "target": "chain-of-responsibility",
+      "label": "",
+      "status": "confirmed",
+      "type": "parent-child"
+    },
+    {
+      "id": "web-development-to-http-and-transport",
+      "source": "web-development",
+      "target": "http-and-transport",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "web-development-to-web-session-identity",
+      "source": "web-development",
+      "target": "web-session-identity",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "web-development-to-api-timeout-safe-retry",
+      "source": "web-development",
+      "target": "api-timeout-safe-retry",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "http-and-transport-to-http-request-response",
+      "source": "http-and-transport",
+      "target": "http-request-response",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "http-and-transport-to-http-cache",
+      "source": "http-and-transport",
+      "target": "http-cache",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "http-and-transport-to-http-cors",
+      "source": "http-and-transport",
+      "target": "http-cors",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "http-and-transport-to-http-negotiation-compression",
+      "source": "http-and-transport",
+      "target": "http-negotiation-compression",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "http-and-transport-to-http-redirect",
+      "source": "http-and-transport",
+      "target": "http-redirect",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "http-and-transport-to-https-tls-handshake",
+      "source": "http-and-transport",
+      "target": "https-tls-handshake",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "http-and-transport-to-http-connection-animation",
+      "source": "http-and-transport",
+      "target": "http-connection-animation",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "web-session-identity-to-web-session-browser-storage",
+      "source": "web-session-identity",
+      "target": "web-session-browser-storage",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "web-session-identity-to-web-jwt",
+      "source": "web-session-identity",
+      "target": "web-jwt",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "web-development-to-realtime-streaming",
+      "source": "web-development",
+      "target": "realtime-streaming",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "realtime-streaming-to-sse-streaming-response",
+      "source": "realtime-streaming",
+      "target": "sse-streaming-response",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "realtime-streaming-to-http-polling",
+      "source": "realtime-streaming",
+      "target": "http-polling",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "realtime-streaming-to-websocket",
+      "source": "realtime-streaming",
+      "target": "websocket",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    }
+  ],
+  "positions": {
+    "design-patterns": [
+      -268.40487726297727,
+      -77.33333333333333,
+      0
+    ],
+    "python-singleton": [
+      -193.52719923630056,
+      58,
+      0
+    ],
+    "simple-factory": [
+      -357.4323091714646,
+      19.333333333333332,
+      81.55642035494806
+    ],
+    "strategy-pattern": [
+      -255.86979106698018,
+      -19.333333333333332,
+      -142.8308418789048
+    ],
+    "proxy-pattern": [
+      -175.0377582430039,
+      -58,
+      121.78087323512722
+    ],
+    "decorator-pattern": [
+      -419.5126829611614,
+      -96.66666666666666,
+      -26.728843167631375
+    ],
+    "observer-pattern": [
+      -147.42738027288874,
+      -135.33333333333331,
+      -76.95598092280349
+    ],
+    "template-method-pattern": [
+      -299.7486256430284,
+      -174,
+      116.59718165899798
+    ],
+    "chain-of-responsibility": [
+      -302.9165250596987,
+      -212.66666666666666,
+      -66.45007775030605
+    ],
+    "web-development": [
+      221.40816126940084,
+      -77.33333333333333,
+      0
+    ],
+    "http-and-transport": [
+      286.50967837802045,
+      -3.515151515151515,
+      0
+    ],
+    "web-session-identity": [
+      151.13774561894957,
+      -52.72727272727273,
+      64.37345697218481
+    ],
+    "api-timeout-safe-retry": [
+      229.7397334268986,
+      -101.93939393939394,
+      -94.93396749120583
+    ],
+    "realtime-streaming": [
+      261.0184541869654,
+      -151.15151515151516,
+      51.66461288762973
+    ],
+    "http-request-response": [
+      314.1275707201135,
+      135.33333333333331,
+      0
+    ],
+    "http-cache": [
+      108.25627006639232,
+      96.66666666666666,
+      103.6564012359223
+    ],
+    "http-cors": [
+      237.8824920818013,
+      57.99999999999998,
+      -187.71650250623273
+    ],
+    "http-negotiation-compression": [
+      349.7289924957229,
+      19.333333333333332,
+      167.37180117612806
+    ],
+    "http-redirect": [
+      0.20898336347488083,
+      -19.333333333333332,
+      -39.12701999568203
+    ],
+    "https-tls-handshake": [
+      416.47851376502206,
+      -57.999999999999986,
+      -124.08779069455758
+    ],
+    "http-connection-animation": [
+      161.38945255389137,
+      -96.66666666666664,
+      223.26660481662958
+    ],
+    "web-session-browser-storage": [
+      117.8732178792366,
+      -135.33333333333331,
+      -199.35023325091817
+    ],
+    "web-jwt": [
+      419.5126829611614,
+      -174,
+      72.34745358915107
+    ],
+    "sse-streaming-response": [
+      47.22631117794465,
+      -212.66666666666666,
+      71.89973565741649
+    ],
+    "http-polling": [
+      286.4488449004745,
+      -251.33333333333331,
+      -138.9881630672288
+    ],
+    "websocket": [
+      249.15758443885693,
+      -290,
+      88.46953375400673
+    ],
+    "backend-microservices": [
+      -168.72727272727272,
+      233.75757575757575,
+      0
+    ],
+    "backend-rpc-grpc": [
+      -56.24242424242424,
+      233.75757575757575,
+      28.492265070521274
+    ],
+    "image-sensor-to-compression": [
+      56.24242424242424,
+      233.75757575757575,
+      -42.02003440907546
+    ],
+    "python-decorator": [
+      168.72727272727272,
+      233.75757575757575,
+      33.47835352963698
+    ],
+    "snowflake-id": [
+      -168.72727272727272,
+      290,
+      -7.353420589769323
+    ]
+  },
+  "camera": {
+    "yaw": 0.2,
+    "pitch": -0.15,
+    "zoom": 1
+  }
+}

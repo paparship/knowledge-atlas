@@ -1,0 +1,12 @@
+{
+  "id": "uuid",
+  "title": "UUID",
+  "updatedAt": "2026-11-15T14:05:54.647Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "http-polling",
+  "title": "轮询",
+  "updatedAt": "2026-11-15T11:22:09.465Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "design-patterns",
+  "title": "设计模式",
+  "updatedAt": "2026-11-14T17:40:41.477Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}
