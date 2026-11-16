@@ -73,7 +73,11 @@ async function load(force=false){try{const data=await api('/api/state');if(!stat
 async function action(body){if(PUBLIC_MODE)return false;if(busy)return false;busy=true;try{const data=await api('/api/action',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...body,revision:state.revision})});adopt(data);$('#sync').textContent='已保存到工作区';return true;}catch(e){toast(e.message);return false;}finally{busy=false;}}
 let sidebarView='tree';
 try { sidebarView=localStorage.getItem('atlas-sidebar-view')||'tree'; } catch {}
-const collapsedNodes=new Set();
+const expandedNodes=new Set();
+try {
+  const saved=JSON.parse(localStorage.getItem('atlas-expanded-nodes')||'[]');
+  if(Array.isArray(saved))for(const id of saved)if(typeof id==='string')expandedNodes.add(id);
+} catch {}
 function renderList(){
   const all=nodes(),items=visible();
   $('#allCount').textContent=all.length;$('#draftCount').textContent=state.draft.length;$('#confirmedCount').textContent=state.confirmed.length;$('#listCount').textContent=items.length;
@@ -95,7 +99,7 @@ function renderList(){
     const branch=id=>{
       if(visited.has(id))return '';visited.add(id);
       const n=shown.get(id),kids=(children.get(id)||[]).filter(k=>!visited.has(k));
-      const open=searching||!collapsedNodes.has(id);
+      const open=searching||expandedNodes.has(id);
       const toggle=kids.length?'<button class="tree-toggle" data-toggle="'+esc(id)+'" aria-label="'+(open?'收起':'展开')+esc(n.title)+'" aria-expanded="'+open+'">'+(open?'▾':'▸')+'</button>':'<span class="tree-spacer"></span>';
       // Walk collapsed branches too, so they are not rendered again as roots.
       const nested=kids.map(branch).join('');
@@ -107,7 +111,7 @@ function renderList(){
   $('#nodeList').innerHTML=items.length?html:'<p class="empty-list">还没有符合条件的节点。</p>';
   $('#graphStats').textContent=all.length+' 个节点 / '+state.graph.edges.length+' 条关联';
   $('#nodeList').querySelectorAll('[data-node]').forEach(b=>b.onclick=()=>selectNode(b.dataset.node));
-  $('#nodeList').querySelectorAll('[data-toggle]').forEach(b=>b.onclick=()=>{const id=b.dataset.toggle;collapsedNodes.has(id)?collapsedNodes.delete(id):collapsedNodes.add(id);renderList();});
+  $('#nodeList').querySelectorAll('[data-toggle]').forEach(b=>b.onclick=()=>{const id=b.dataset.toggle;expandedNodes.has(id)?expandedNodes.delete(id):expandedNodes.add(id);try{localStorage.setItem('atlas-expanded-nodes',JSON.stringify([...expandedNodes]));}catch{}renderList();});
   document.querySelectorAll('[data-view]').forEach(b=>{b.setAttribute('aria-pressed',b.dataset.view===sidebarView);b.onclick=()=>{sidebarView=b.dataset.view;try{localStorage.setItem('atlas-sidebar-view',sidebarView);}catch{}renderList();};});
 }
 function guard(){return !dirty||confirm('当前编辑尚未保存，要放弃这些修改吗？');}
