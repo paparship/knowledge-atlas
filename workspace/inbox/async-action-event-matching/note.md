@@ -17,7 +17,7 @@ ChapterRunner 按顺序读取节点：call 发起动作后继续，gate 等待�
 
 调用表使用 Map，按调用 ID 保存状态、Promise 及其完成回调；配置中的 a、b 则映射到本次执行生成的 ID。
 
-```text
+```javascript
 调用表 = Map()  // 调用 ID → 调用记录
 
 function 发起调用(动作, 参数):
@@ -51,7 +51,7 @@ Promise 保存完成状态和结果：先等待时，结果到达后唤醒等待
 
 ## ChapterRunner 怎么推进
 
-```text
+```javascript
 async function ChapterRunner(节点列表):
     调用引用 = Map()  // a、b → 调用 ID
 
