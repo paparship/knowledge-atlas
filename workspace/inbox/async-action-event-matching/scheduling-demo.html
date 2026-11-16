@@ -1,0 +1,103 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+*{box-sizing:border-box}body{margin:0;padding:10px;color:#24324b;font:13px/1.4 system-ui,sans-serif;background:white}select,button{font:inherit;border:1px solid #ccd5e5;border-radius:5px;background:white;color:inherit;padding:5px 8px}select{width:100%}button{cursor:pointer}button:disabled{opacity:.4}.bar{display:flex;gap:6px;align-items:center;margin-top:8px}.bar span{margin-left:auto;color:#69768c}.primary{background:#245ac9;color:white;border-color:#245ac9}.runner{margin:8px 0;padding:6px 8px;background:#edf3ff;border-left:3px solid #245ac9}.runner.wait{background:#fff5df;border-color:#bd8521}.heading{display:flex;justify-content:space-between;font-weight:600;margin:5px 0}.heading small{font-weight:400;color:#68758b}pre{margin:0;background:#f5f7fb;border:1px solid #e0e6ef;border-radius:5px;padding:5px 0;overflow:auto;font:12px/1.6 Consolas,monospace;height:145px}pre span.line{display:block;min-width:max-content;padding:0 8px;border-left:3px solid transparent}pre span.active{background:#dce8ff;border-left-color:#245ac9}em{font-style:normal;color:#6b3ca2}.num{display:inline-block;width:20px;color:#8c97aa;user-select:none}.data{margin-top:6px;display:grid;grid-template-columns:1fr 1.6fr;gap:6px}.box{border:1px solid #dce3ef;border-radius:5px;padding:5px 7px;min-height:49px;font:12px/1.5 Consolas,monospace}.box b{font:600 11px system-ui;color:#66738b;display:block;margin-bottom:2px}.entry{white-space:nowrap}.changed{animation:flash .7s ease}.done{color:#245ac9}.event{min-height:35px;margin-top:7px;font-size:12px}.event strong{color:#245ac9} @keyframes flash{from{background:#cbdcff}to{background:transparent}}@media(prefers-reduced-motion:reduce){.changed{animation:none}}
+</style>
+<select id="scenario" aria-label="调度时序"><option value="aFirst">调用型 gate：A 先完成</option><option value="bFirst">调用型 gate：B 先完成</option><option value="early">调用型 gate：结果先于等待</option><option value="owned">状态型 gate：初始条件已满足</option><option value="inventory">状态型 gate：监听后满足</option><option value="quest">任务型 call：任务系统回调</option></select>
+<div id="runner" class="runner"></div>
+<div class="heading"><span id="functionName"></span><small id="context"></small></div><pre id="code"></pre>
+<div class="data"><div class="box" id="refs"></div><div class="box" id="calls"></div></div>
+<div class="event" id="event" aria-live="polite"></div>
+<div class="bar"><button id="play" class="primary">播放</button><button id="prev">上一步</button><button id="next">下一步</button><span id="index"></span></div>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+// 与正文相同的函数结构，省略参数校验以突出调度路径。
+const code={
+runChapter:[ 'for (const node of nodes) {','  if (node.type === "call") {','    const id = startCall(node.action, node.args);','    refs.set(node.ref, id);','  } else if (node.type === "gate") {','    const result = await waitForCall(refs.get(node.ref));','    if (!result.ok) return result;','  }','} // 继续读取下一节点'],
+startCall:['const callId = createUniqueId();','let resolve;','const promise = new Promise(done => { resolve = done; });','calls.set(callId, { status: "pending", promise, resolve });','startGameAction(callId, action, args);','return callId;'],
+startGameAction:['movementSystem.moveTo(args.npcId, args.target, () => {','  onActionResult(callId, { ok: true });','});'],
+waitForCall:['const call = calls.get(callId);','return call.promise;'],
+onActionResult:['const call = calls.get(callId);','if (!call || call.status !== "pending") return;','call.status = "settled";','call.resolve(result);'],
+questAdapter:['questSystem.start(args.questId, {','  onComplete: () => onActionResult(callId, { ok: true })','});'],
+inventoryRunner:['for (const node of nodes) {','  if (node.condition?.type === "inventory") {','    const result = await waitForInventory("flower", 3);','    if (!result.ok) return result;','  }','} // 继续读取下一节点'],
+waitForInventory:['return new Promise(resolve => {','  const check = () => {','    if (inventorySystem.getCount(itemId) >= count) {','      unsubscribe();','      resolve({ ok: true });','    }','  };','  const unsubscribe = inventorySystem.onChange(check);','  check();','});']};
+let steps=[],index=0,timer=null;
+function build(mode){
+ let state={fn:'runChapter',line:0,runner:'读取第一个节点',waiting:false,refs:{},calls:{},context:'Runner',message:'配置输入：call(a) → call(b) → gate(b) → 下一节点'};
+ const out=[];
+ const add=(patch)=>{state={...state,...patch};out.push(structuredClone(state));};
+ const call=(ref,id,quest=false)=>{
+  add({fn:'runChapter',line:2,context:`node.ref = ${ref}`,runner:`call(${ref})`,message:`Runner 同步进入 startCall，创建这次调用。`});
+  add({fn:'startCall',line:3,context:`callId = ${id}`,calls:{...state.calls,[id]:'pending'},message:`先保存 ${id} 的 Promise 和 resolve；回调稍后通过 ID 找回这一条。`});
+  add({fn:quest?'questAdapter':'startGameAction',line:0,context:`闭包捕获 callId = ${id}`,message:quest?'启动任务并登记 onComplete；采集进度由任务系统管理。':'登记完成回调；箭头函数记住本次 callId，动作完成时才执行它。'});
+  if(mode==='early' && id==='C2'){ result(id); out[out.length-1].message='动作立即回调，C2 的 Promise 已完成；startCall 随后返回 ID。'; }
+  add({fn:'startCall',line:5,context:`return ${id}`,message:'startCall 返回 ID；动作在游戏系统中继续执行。'});
+  add({fn:'runChapter',line:3,refs:{...state.refs,[ref]:id},context:`refs.set(${ref}, ${id})`,message:`refs 保存配置名到调用 ID 的映射，然后 Runner 读取下一节点。`});
+ };
+ const result=(id,quest=false)=>{
+  add({fn:quest?'questAdapter':'startGameAction',line:1,context:`游戏系统 → 回调(${id})`,message:quest?'任务统计达到 3 次，调用登记的 onComplete。':`动作 ${id} 完成，游戏系统执行之前登记的回调。`});
+  add({fn:'onActionResult',line:0,context:`callId = ${id}`,message:`calls.get(${id}) 定位这次调用的记录。`});
+  add({fn:'onActionResult',line:3,calls:{...state.calls,[id]:'fulfilled'},context:`resolve ${id}`,message:`设置 status = settled，并完成 ${id} 的 Promise。${id==='C1'&&mode==='aFirst'?'Runner 等待 C2，仍保持挂起。':'已等待它的 Runner 将在微任务中恢复。'}`});
+ };
+ const gate=(ref,id)=>{
+  add({fn:'runChapter',line:5,runner:`gate(${ref}) → await ${id}`,context:`refs.get(${ref}) = ${id}`,message:`gate 用 refs 取出 ID，再调用 waitForCall(${id})。`});
+  add({fn:'waitForCall',line:1,context:`callId = ${id}`,message:`返回 calls 中 ${id} 的同一个 Promise。`});
+  add({fn:'runChapter',line:5,waiting:true,context:'Runner 挂起',message:state.calls[id]==='fulfilled'?'Promise 已完成，await 在微任务中恢复，并取得之前保存的结果。':`await 挂起 Runner；等待 ${id}，游戏系统仍可执行并触发回调。`});
+ };
+ const resume=()=>add({fn:'runChapter',line:6,waiting:false,runner:'await 恢复 → 检查结果 → 下一节点',context:'Runner 微任务',message:'await 取得 { ok: true }，for 循环继续读取下一节点。'});
+ if(mode==='owned'||mode==='inventory'){
+  const owned=mode==='owned';
+  add({fn:'inventoryRunner',line:2,runner:'gate：flower ≥ 3',context:'Runner',refs:{},calls:{},inventory:owned?3:1,watch:false,condition:'未创建',message:'配置输入只有状态型 gate；直接调用 waitForInventory，不创建 callId。'});
+  add({fn:'waitForInventory',line:7,watch:true,condition:'pending',context:'登记监听',message:'创建独立的条件 Promise，并向背包系统登记 check 回调。'});
+  add({fn:'waitForInventory',line:8,context:'首次 check()',message:'登记后立即调用一次 check，读取当前背包状态。'});
+  add({fn:'waitForInventory',line:2,context:`getCount = ${owned?3:1}`,message:owned?'当前已有 3 朵花，条件成立。':'当前只有 1 朵花，check 返回，Promise 保持 pending。'});
+  if(!owned){
+   add({fn:'inventoryRunner',line:2,waiting:true,runner:'await 条件 Promise：挂起',context:'Runner 挂起',message:'Runner 等待；背包的变化由物品系统通知。'});
+   add({fn:'waitForInventory',line:2,inventory:3,context:'背包 onChange → check()',message:'背包数量变为 3，物品系统执行已登记的 check。'});
+  }
+  add({fn:'waitForInventory',line:3,watch:false,context:'取消监听',message:'条件成立，移除 check 监听。'});
+  add({fn:'waitForInventory',line:4,condition:'fulfilled',context:'resolve({ ok: true })',message:'完成条件 Promise；await 将取得成功结果。'});
+  add({fn:'inventoryRunner',line:3,waiting:false,runner:'await 恢复 → 下一节点',context:'Runner 微任务',message:'Runner 继续；整个过程没有使用 refs 和 calls 调用表。'});
+ }else if(mode==='quest'){
+  add({message:'配置输入：call(startQuest, ref=task) → gate(task) → 下一节点'});
+  call('task','Q1',true);gate('task','Q1');result('Q1',true);resume();
+ }else{
+  add({});call('a','C1');call('b','C2');
+  if(mode==='early'){
+   gate('b','C2');resume();
+  }else{
+   gate('b','C2');
+   if(mode==='aFirst'){result('C1');result('C2');resume();}
+   else{result('C2');resume();result('C1');out[out.length-1].message='C1 的 Promise 完成；Runner 已越过 gate(b)，无需等待 C1。';}
+  }
+ }
+ return out;
+}
+const escape=s=>s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+function render(){
+ const s=steps[index],previous=steps[index-1];
+ $('runner').textContent='Runner · '+s.runner;$('runner').className='runner'+(s.waiting?' wait':'');
+ $('functionName').textContent=s.fn==='questAdapter'?'startGameAction · quest':s.fn==='inventoryRunner'?'runChapter · inventory':s.fn;
+ $('context').textContent=s.context;
+ $('code').innerHTML=code[s.fn].map((line,i)=>`<span class="line ${i===s.line?'active':''}"><span class="num">${i+1}</span>${escape(line).replace(/\b(const|let|return|if|else|for|await|new)\b/g,'<em>$1</em>')}</span>`).join('');
+ $('code').scrollTop=Math.max(0,(s.line-4)*19.2);
+ $('refs').innerHTML='<b>refs · 配置名 → ID</b>'+ (Object.entries(s.refs).map(([k,v])=>`<div class="entry">${k} → ${v}</div>`).join('')||'∅');
+ if(s.inventory!==undefined){
+  $('calls').innerHTML=`<b>条件等待 · calls = ∅</b>flower: ${s.inventory} / 3 · 监听: ${s.watch?'有':'无'}<br>Promise: ${s.condition}`;
+ }else{
+  $('calls').innerHTML='<b>calls · ID → { promise, resolve, status }</b>'+(Object.entries(s.calls).map(([id,p])=>`<div class="entry ${previous?.calls[id]!==p?'changed':''} ${p==='fulfilled'?'done':''}">${id}: ${p==='fulfilled'?'settled':'pending'} · P(${id}): ${p}</div>`).join('')||'∅');
+ }
+ $('event').textContent=s.message;$('index').textContent=`${index+1} / ${steps.length}`;
+ $('prev').disabled=index===0;$('next').disabled=index===steps.length-1;
+ $('play').textContent=timer?'暂停':index===steps.length-1?'重播':'播放';
+}
+function stop(){clearInterval(timer);timer=null;}
+function select(){stop();steps=build($('scenario').value);index=0;render();}
+ $('scenario').onchange=select;
+ $('prev').onclick=()=>{stop();index=Math.max(0,index-1);render();};
+ $('next').onclick=()=>{stop();index=Math.min(steps.length-1,index+1);render();};
+ $('play').onclick=()=>{if(timer){stop();render();return;}if(index===steps.length-1)index=0;timer=setInterval(()=>{index++;if(index===steps.length-1)stop();render();},2300);render();};
+ document.addEventListener('visibilitychange',()=>{if(document.hidden){stop();render();}});
+ select();
+})();
+</script></html>

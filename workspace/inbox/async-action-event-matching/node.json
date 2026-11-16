@@ -1,12 +1,22 @@
 {
   "id": "async-action-event-matching",
   "title": "异步动作与事件匹配",
-  "updatedAt": "2026-11-16T17:59:01.491Z",
+  "updatedAt": "2026-11-16T18:10:21.214Z",
   "blocks": [
     {
       "id": "note",
       "format": "markdown",
       "file": "note.md"
+    },
+    {
+      "id": "scheduling-demo",
+      "format": "html",
+      "file": "scheduling-demo.html"
+    },
+    {
+      "id": "implementation",
+      "format": "markdown",
+      "file": "implementation.md"
     }
   ]
 }
