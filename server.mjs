@@ -95,6 +95,7 @@ export async function createApp(workspace = path.join(ROOT, 'workspace')) {
       if (action === 'saveLayout') {
         for (const [key,p] of Object.entries(payload.positions || {})) if (!ids.has(key) || !Array.isArray(p) || p.length!==3 || p.some(v=>!Number.isFinite(v) || Math.abs(v)>100000)) throw fail('节点坐标无效');
         if (!payload.camera || ['yaw','pitch','zoom'].some(k=>!Number.isFinite(payload.camera[k])) || payload.camera.zoom<=0) throw fail('视角无效');
+        if (['panX','panY'].some(k=>payload.camera[k]!==undefined&&!Number.isFinite(payload.camera[k]))) throw fail('平移坐标无效');
       }
       await writeJSON(path.join(workspace,'history',Date.now()+'-'+crypto.randomUUID().slice(0,8)+'.json'), s);
       if (action === 'saveNode') await writeNode('inbox', payload.node);
