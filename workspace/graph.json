@@ -192,6 +192,14 @@
       "type": "parent-child",
       "label": "",
       "status": "draft"
+    },
+    {
+      "id": "flow-async-event-matching",
+      "source": "rpg-data-driven-story",
+      "target": "async-action-event-matching",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
     }
   ],
   "positions": {
