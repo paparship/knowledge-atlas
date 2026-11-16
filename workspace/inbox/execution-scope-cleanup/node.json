@@ -1,0 +1,12 @@
+{
+  "id": "execution-scope-cleanup",
+  "title": "执行作用域与资源清理",
+  "updatedAt": "2026-11-16T19:54:45.679Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

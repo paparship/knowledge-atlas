@@ -216,6 +216,14 @@
       "type": "parent-child",
       "label": "",
       "status": "draft"
+    },
+    {
+      "id": "flow-to-execution-scope",
+      "source": "rpg-data-driven-story",
+      "target": "execution-scope-cleanup",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
     }
   ],
   "positions": {
