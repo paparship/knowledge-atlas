@@ -36,7 +36,7 @@ function startCall(action, args) {
   return callId;
 }
 
-// 将动作交给游戏系统；移动完成时，通过回调回传对应调用的结果。
+// 将动作交给对应游戏系统，在动作或任务完成时回传结果。
 function startGameAction(callId, action, args) {
   if (action === "move") {
     movementSystem.moveTo(args.npcId, args.target, () => {
@@ -45,6 +45,11 @@ function startGameAction(callId, action, args) {
   } else if (action === "dialogue") {
     dialogueSystem.show(args.npcId, args.text, () => {
       onActionResult(callId, { ok: true });
+    });
+  } else if (action === "startQuest") {
+    // 任务系统从激活时开始统计采集事件，达到目标后调用 onComplete。
+    questSystem.start(args.questId, {
+      onComplete: () => onActionResult(callId, { ok: true })
     });
   } else {
     onActionResult(callId, { ok: false, error: "Unknown action" });
@@ -66,6 +71,22 @@ function waitForCall(callId) {
   if (!call) throw new Error("Unknown call ID");
   return call.promise;
 }
+
+// 等待背包数量满足条件；已有物品也计入，不依赖某次动作调用。
+function waitForInventory(itemId, count) {
+  return new Promise(resolve => {
+    const check = () => {
+      if (inventorySystem.getCount(itemId) >= count) {
+        unsubscribe();
+        resolve({ ok: true });
+      }
+    };
+
+    const unsubscribe = inventorySystem.onChange(check);
+    check(); // 登记监听后立即检查，已有 3 朵花就直接完成。
+  });
+}
+
 ```
 
 Promise 保存完成状态和结果：先等待时，结果到达后唤醒等待；先完成时，后续等待直接得到已有结果。这里用结果对象表达成功或失败。
@@ -83,16 +104,56 @@ async function runChapter(nodes) {
       if (node.ref) refs.set(node.ref, callId);
       // 发起动作后，继续读取下一节点
     } else if (node.type === "gate") {
-      const callId = refs.get(node.ref);
-      const result = await waitForCall(callId);
+      let result;
+      if (node.condition?.type === "inventory") {
+        // 状态型 gate：直接检查背包，不需要前置 call。
+        result = await waitForInventory(
+          node.condition.itemId, node.condition.count
+        );
+      } else {
+        // 调用型 gate：等待 move、dialogue 或 startQuest 的结果。
+        result = await waitForCall(refs.get(node.ref));
+      }
       if (!result.ok) return result;
-      // 对应动作成功后，继续下一节点
+      // 等待成功后，继续下一节点
     }
   }
 }
 ```
 
 在这个场景中，a、b 分别指向两个调用记录；A 的结果只完成 A 的 Promise，gate(b) 等待的是 B 的 Promise。
+
+同一个 Runner 可以接入下面两种节点配置：
+
+```javascript
+// 背包已有 3 朵花即可继续，包括剧本启动前获得的花。
+const inventoryNodes = [
+  {
+    type: "gate",
+    condition: { type: "inventory", itemId: "flower", count: 3 }
+  },
+  {
+    type: "call", action: "dialogue",
+    args: { npcId: "villager", text: "你带够花了。" }
+  }
+];
+
+// collect-3-flowers 的任务规则：激活后采集 3 次花。
+// 进度统计由任务系统负责，剧情等待任务完成回调。
+const questNodes = [
+  {
+    type: "call", action: "startQuest", ref: "flowerQuest",
+    args: { questId: "collect-3-flowers" }
+  },
+  { type: "gate", ref: "flowerQuest" },
+  {
+    type: "call", action: "dialogue",
+    args: { npcId: "villager", text: "采集任务完成了。" }
+  }
+];
+
+// 分别作为两段独立流程运行：runChapter(inventoryNodes) 或 runChapter(questNodes)。
+```
 
 ## 三种完成时序
 
@@ -126,24 +187,3 @@ Runner：执行 gate(b) → 取得已有结果 → 开始对话
 
 因此，调用记录要在启动动作前建立，完成结果保留在对应的 Promise 中，供 gate 读取。
 
-## 状态条件与任务进度
-
-**背包里有 3 朵花：gate 等待当前状态满足。** 玩家在剧本启动前就可能拥有花，这里不需要先发起动作，也没有对应的调用 ID。
-
-```text
-gate 背包中花的数量 >= 3
-    已满足 → 直接继续
-    未满足 → 监听背包变化，满足后继续
-```
-
-实现时先订阅背包变化，再立即检查一次当前数量；变化时重新检查，满足后解除订阅并放行，避免检查与订阅之间漏掉变化。
-
-**接任务后采集 3 朵花：任务系统记录接取后的采集进度。** 接任务前已有的花不计入，背包数量也不能直接代表本次任务的采集次数。
-
-```text
-t = call 启动“采集 3 朵花”任务
-gate 等待 t 对应的任务完成
-call 播放完成任务后的剧情
-```
-
-任务系统从任务激活时开始监听采集事件、累计进度，达到 3 次后完成任务；任务完成回调再带回 t 的调用 ID，完成对应的 Promise，剧情运行器继续执行。
