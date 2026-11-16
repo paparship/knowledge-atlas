@@ -20,6 +20,7 @@ ChapterRunner 按顺序读取节点：call 发起动作后继续，gate 等待�
 ```javascript
 const calls = new Map(); // callId → 调用记录
 
+// 创建调用记录并发起游戏动作，返回调用 ID，不等待动作完成。
 function startCall(action, args) {
   const callId = createUniqueId();
   let resolve;
@@ -35,6 +36,7 @@ function startCall(action, args) {
   return callId;
 }
 
+// 接收动作结果，按调用 ID 完成对应的 Promise，唤醒等待者。
 function onActionResult(callId, result) {
   const call = calls.get(callId);
   if (!call || call.status !== "pending") return;
@@ -43,6 +45,7 @@ function onActionResult(callId, result) {
   call.resolve(result); // result: { ok, value?, error? }
 }
 
+// 返回指定调用的 Promise，供 gate 等待或取得已完成的结果。
 function waitForCall(callId) {
   const call = calls.get(callId);
   if (!call) throw new Error("Unknown call ID");
@@ -55,6 +58,7 @@ Promise 保存完成状态和结果：先等待时，结果到达后唤醒等待
 ## ChapterRunner 怎么推进
 
 ```javascript
+// 顺序执行节点：call 发起动作后继续，gate 等待对应动作成功后继续。
 async function runChapter(nodes) {
   const refs = new Map(); // 配置里的 a、b → 本次调用 ID
 
