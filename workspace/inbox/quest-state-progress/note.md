@@ -1,102 +1,113 @@
-任务状态与进度管理，是把任务目标定义为配置，为每次接取保存独立的运行状态，并根据游戏状态或事件更新进度、判定完成。
+任务状态与进度管理，是记录任务的执行阶段和目标进度，并根据游戏状态或事件判断任务何时完成。
 
-## 从一个采集任务开始
+## 1. 最简单的任务：采集 3 次花
 
-村民要求玩家在接取任务后采集 3 次花，完成后继续对话。
-
-任务系统需要回答三件事：目标是什么、这次任务进行到哪里、什么事件会推进它。
-
-### 1. 分开保存任务定义与运行实例
-
-任务定义描述规则；运行实例记录玩家这次执行的状态。
+玩家接取任务后，开始监听采花事件；每发生一次，计数加 1，达到 3 次就完成。
 
 ```javascript
-// 配置：这类任务的目标是什么。
-const definition = {
-  questId: "gather-flowers",
-  objective: {
-    type: "eventCount",
-    event: "flowerGathered",
-    targetId: "flower",
-    required: 3
-  }
-};
-
-// 实例：本次接取产生的进度，作为存档数据。
-const instance = {
-  instanceId: "quest-run-42",
-  questId: "gather-flowers",
-  state: "active",
-  current: 0
-};
-```
-
-任务再次接取时，沿用同一份定义，创建新的实例；完成通知也携带 instanceId，关联到这次执行。
-
-### 2. 由目标类型决定如何计算进度
-
-| 目标语义 | 激活时 | 后续更新 |
-| --- | --- | --- |
-| 当前持有 3 朵花 | 读取背包当前数量 | 背包变化后重新读取数量 |
-| 接取后采集 3 次花 | 计数从 0 开始 | 每次匹配的采集事件使计数加 1 |
-
-第一种是状态判定，进度来自物品系统；第二种是事件累计，进度保存在任务实例中。
-
-以第二种为例，采集系统发出事件，任务系统按事件类型和目标匹配活跃任务，再更新对应实例：
-
-```javascript
-// 采集系统完成一次采集后发出事件。
-events.emit("flowerGathered", { targetId: "flower" });
-
-// 任务模块初始化时登记处理器；只推进匹配的活跃实例。
-events.on("flowerGathered", event => {
-  for (const instance of activeInstances.values()) {
-    const goal = definitions.get(instance.questId).objective;
-    if (goal.type !== "eventCount") continue;
-    if (goal.event !== "flowerGathered") continue;
-    if (goal.targetId !== event.targetId) continue;
-
-    instance.current = Math.min(instance.current + 1, goal.required);
-    notifyProgress(instance); // 任务面板据此更新进度。
-
-    if (instance.current === goal.required) {
-      completeQuest(instance);
+// 接取任务时调用，先只处理这一种任务。
+function acceptFlowerQuest() {
+  let current = 0;
+  const unsubscribe = events.on("flowerGathered", () => {
+    current += 1;
+    if (current === 3) {
+      unsubscribe();
+      onCompleted();
     }
-  }
-});
-
-// 完成任务：先落下终态，再通知外部。
-function completeQuest(instance) {
-  instance.state = "completed";
-  activeInstances.delete(instance.instanceId);
-  notifyCompleted({ instanceId: instance.instanceId });
+  });
 }
 ```
 
-### 3. 用状态机规定任务何时能推进
+这时核心只有一个计数器和一个完成条件。
 
-最小生命周期是：
+## 2. 允许放弃任务：进度之外还需要状态
+
+玩家采了 2 次花后放弃任务，之后再采花就不应推进它；因此，需要记录任务是否仍在进行。
 
 ```text
-pending ──接取──→ active ──目标达成──→ completed
-                   │
+pending ──接取──→ active ──达到目标──→ completed
                    └──放弃──→ cancelled
 ```
 
-只有 active 实例参与目标检测和进度更新；状态转换统一由任务管理器处理，面板、剧情和游戏系统通过接口请求变化。
+处理事件时先检查状态，只有 active 才更新进度；完成或放弃后停止监听，由统一的状态转换入口处理这些变化。
 
-若任务需要交付物品或发放奖励，可以加入 settling：目标达成后进入结算，交付和奖励处理成功后再进入 completed。
+如果还需要发奖励，可以在 active 与 completed 之间加入 settling，表示目标已达成、正在结算，结算成功后再通知完成。
 
-### 4. 通过完成通知接回剧情
+## 3. 增加采矿任务：把差异从流程里提出来
+
+现在又有“采集 5 次矿石”的任务，两者都执行“匹配采集事件 → 更新计数 → 检查目标 → 完成”，差别是采集对象和目标次数。
+
+先用简写表达规则：
 
 ```text
-剧情 call → 接取任务 → 创建 active 实例
-                         ↓
-采集系统 → 采集事件 → 匹配目标 → 更新进度 1 → 2 → 3
-                         ↓
-                 completed(instanceId)
-                         ↓
-剧情适配层 → 完成对应 call 的 Promise → gate 恢复 → 继续对话
+采花任务：累计 gather(flower) 事件，达到 3 次
+采矿任务：累计 gather(ore)    事件，达到 5 次
 ```
 
-任务系统负责目标判定与生命周期，剧情系统负责前后流程；任务面板和引导系统订阅进度、状态变化，更新各自的展示。
+采集系统统一发出 `gather(itemId)` 事件，任务系统用每个活跃任务的规则匹配；一次采花可以同时推进多个要求采花的任务。
+
+```javascript
+// 收到采集事件后，按各任务的目标更新进度。
+function onGather(itemId) {
+  for (const task of activeTasks) {
+    if (task.targetId !== itemId) continue;
+    task.current += 1;
+    if (task.current >= task.required) {
+      complete(task);
+    }
+  }
+}
+```
+
+## 4. 改为“持有 3 朵花”：目标的判断方式也需要区分
+
+如果要求的是当前背包中有 3 朵花，玩家接取前已有的花也应计入，进度便要从背包读取。
+
+| 目标 | 接取时 | 后续更新 |
+| --- | --- | --- |
+| 接取后采集 3 次 | 计数置为 0 | 匹配的采集事件使计数加 1 |
+| 当前持有 3 朵花 | 读取当前背包数量 | 背包变化后重新读取数量 |
+
+于是，目标规则再增加一个判断类型：`eventCount` 表示累计事件，`inventoryCount` 表示读取持有量；任务管理器根据类型选用相应的检测逻辑。
+
+## 5. 任务可以重复接取：分开规则与这次进度
+
+同一个任务明天可以再次接取，“采花 3 次”的规则沿用，而这次的进度从 0 开始。
+
+因此，将任务拆为两份数据：**任务定义**保存目标规则，**运行实例**保存本次状态和进度；定义用 questId 标识，每次接取用独立的 instanceId 标识。
+
+任务面板读取实例展示进度，完成通知携带 instanceId；剧情适配层据此完成对应 call 的 Promise，让等待它的 gate 继续。
+
+## 6. 最后把简写展开为 JSON
+
+前面的简写：
+
+```text
+采花任务：接取后累计 gather(flower)，达到 3 次
+这次执行：进行中，已完成 2 次
+```
+
+任务定义把“监听什么、匹配谁、达到多少”变成明确字段：
+
+```json
+{
+  "questId": "gather-flowers",
+  "objective": {
+    "type": "eventCount",
+    "event": "gather",
+    "targetId": "flower",
+    "required": 3
+  }
+}
+```
+
+对应的运行实例单独保存，可随玩家存档恢复：
+
+```json
+{
+  "instanceId": "quest-run-42",
+  "questId": "gather-flowers",
+  "state": "active",
+  "current": 2
+}
+```
