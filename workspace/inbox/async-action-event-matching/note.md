@@ -36,6 +36,21 @@ function startCall(action, args) {
   return callId;
 }
 
+// 将动作交给游戏系统；移动完成时，通过回调回传对应调用的结果。
+function startGameAction(callId, action, args) {
+  if (action === "move") {
+    movementSystem.moveTo(args.npcId, args.target, () => {
+      onActionResult(callId, { ok: true });
+    });
+  } else if (action === "dialogue") {
+    dialogueSystem.show(args.npcId, args.text, () => {
+      onActionResult(callId, { ok: true });
+    });
+  } else {
+    onActionResult(callId, { ok: false, error: "Unknown action" });
+  }
+}
+
 // 接收动作结果，按调用 ID 完成对应的 Promise，唤醒等待者。
 function onActionResult(callId, result) {
   const call = calls.get(callId);
