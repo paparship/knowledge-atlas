@@ -280,6 +280,14 @@
       "type": "parent-child",
       "label": "",
       "status": "draft"
+    },
+    {
+      "id": "ai-development-documentation-selection",
+      "source": "ai-assisted-development",
+      "target": "human-ai-documentation-selection",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
     }
   ],
   "positions": {

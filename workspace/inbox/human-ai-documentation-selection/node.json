@@ -1,0 +1,12 @@
+{
+  "id": "human-ai-documentation-selection",
+  "title": "人工与 AI 文档的信息取舍差异",
+  "updatedAt": "2026-11-17T15:48:57.641Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}
