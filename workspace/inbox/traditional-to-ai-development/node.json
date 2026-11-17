@@ -1,0 +1,12 @@
+{
+  "id": "traditional-to-ai-development",
+  "title": "从传统开发到 AI 开发",
+  "updatedAt": "2026-11-17T10:40:35.249Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}
