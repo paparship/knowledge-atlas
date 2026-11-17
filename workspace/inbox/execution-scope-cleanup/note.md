@@ -7,21 +7,23 @@
 例如，旧 Runner 正在等待移动完成：
 
 ```javascript
-// 参数 runner 捕获的是这一次执行对应的对象。
-function startMove(runner, target) {
-  movementSystem.moveTo(target, () => {
-    runner.finishCall("B");
-  });
+// 仍是前文的 startGameAction，属于这一次 Runner。
+function startGameAction(callId, action, args) {
+  if (action === "move") {
+    movementSystem.moveTo(args.npcId, args.target, () => {
+      onActionResult(callId, { ok: true });
+    });
+  }
 }
 
-startMove(currentRunner, target);
-currentRunner = new Runner();
+// 替换变量，不会移除移动系统保存的旧回调。
+currentRunner = createRunner();
 ```
 
 最后一行改变了 currentRunner 的指向，移动系统保存的回调仍然关联着旧对象：
 
 ```text
-移动系统 → 完成回调 → 旧 Runner → 调用记录与等待
+移动系统 → 完成回调 → 旧 onActionResult → 旧 calls 与等待
 currentRunner → 新 Runner
 ```
 
@@ -45,66 +47,99 @@ currentRunner → 新 Runner
 
 取消底层工作可以减少无用执行，检查有效性可以阻止迟到结果生效；两者分别处理资源消耗和执行正确性。
 
-## 4. 用一个执行作用域把它们组织起来
+## 4. 在原有 call / gate 上增加生命周期管理
 
-scope 保存本次执行的有效标记，以及结束时需要调用的清理函数；下面继续用“移动完成后，gate 才继续”的例子。
+沿用前文的 startCall、startGameAction、onActionResult、waitForCall 和 runChapter，以及 `{ ok: true }` 的结果格式；只用 createRunner 将它们和 calls 包在同一次执行中，新增 active、cleanups 和 dispose。
+
+下面展开移动这一条分支：moveTo 额外返回本次动作的取消句柄，cancel 负责停止该动作并释放它保存的回调。
 
 ```javascript
-// 管理一次执行拥有的资源；清理失败时也继续释放其他资源。
-function createScope() {
-  return {
-    active: true,
-    cleanups: [],
+// 每次创建 Runner，都有独立的 calls 和函数闭包。
+function createRunner() {
+  const calls = new Map();
+  let active = true;
+  const cleanups = [];
 
-    dispose() {
-      if (!this.active) return;
-      this.active = false;
-      const cleanups = this.cleanups;
-      this.cleanups = [];
-      for (const cleanup of cleanups) {
-        try { cleanup(); }
-        catch (error) { reportCleanupError(error); }
-      }
-    }
-  };
-}
-
-// call：先登记等待和订阅，再启动移动。
-function startMove(scope, callId, target) {
-  let resolve;
-  const promise = new Promise(done => { resolve = done; });
-
-  // 结束作用域时，让仍挂起的 gate 能够退出。
-  scope.cleanups.push(() => resolve({ status: "cancelled" }));
-
-  const unsubscribe = movementSystem.onFinished(callId, () => {
-    if (!scope.active) return;
-    resolve({ status: "completed" });
-  });
-  scope.cleanups.push(unsubscribe);
-
-  const movement = movementSystem.start(callId, target);
-  scope.cleanups.push(() => movement.cancel());
-  return promise;
-}
-
-// gate：等待返回后再检查有效性，决定是否继续剧情。
-async function runChapter(scope) {
-  try {
-    const promise = startMove(scope, createUniqueId(), target);
-    const result = await promise;
-    if (!scope.active || result.status === "cancelled") return;
-    showNextDialogue();
-  } finally {
-    scope.dispose();
+  // 与前文一致：登记调用，再交给动作适配层。
+  function startCall(action, args) {
+    const callId = createUniqueId();
+    let resolve;
+    const promise = new Promise(done => { resolve = done; });
+    calls.set(callId, { status: "pending", promise, resolve });
+    startGameAction(callId, action, args);
+    return callId;
   }
+
+  // 沿用原来的分发入口，只增加本次动作的清理登记。
+  function startGameAction(callId, action, args) {
+    if (action === "move") {
+      const movement = movementSystem.moveTo(
+        args.npcId, args.target,
+        () => onActionResult(callId, { ok: true })
+      );
+      cleanups.push(() => movement.cancel());
+    }
+  }
+
+  // 沿用结果回传入口，新增本次执行有效性检查。
+  function onActionResult(callId, result) {
+    if (!active) return;
+    const call = calls.get(callId);
+    if (!call || call.status !== "pending") return;
+    call.status = "settled";
+    call.result = result;
+    call.resolve(result);
+  }
+
+  // gate 仍然等待 calls 中对应的 Promise。
+  function waitForCall(callId) {
+    return calls.get(callId).promise;
+  }
+
+  // 先使旧执行失效，再结束等待、释放所属动作和订阅。
+  function dispose() {
+    if (!active) return;
+    active = false;
+    for (const call of calls.values()) {
+      if (call.status !== "pending") continue;
+      call.status = "settled";
+      call.result = { ok: false, error: "cancelled" };
+      call.resolve(call.result);
+    }
+    for (const cleanup of cleanups) {
+      try { cleanup(); }
+      catch (error) { reportCleanupError(error); }
+    }
+    cleanups.length = 0;
+  }
+
+  // 仍按 call / gate 推进，仅在执行前和 await 后检查 active。
+  async function runChapter(nodes) {
+    const refs = new Map();
+    try {
+      for (const node of nodes) {
+        if (!active) return;
+        if (node.type === "call") {
+          const callId = startCall(node.action, node.args);
+          if (node.ref) refs.set(node.ref, callId);
+        } else if (node.type === "gate") {
+          const result = await waitForCall(refs.get(node.ref));
+          if (!active || !result.ok) return result;
+        }
+      }
+    } finally {
+      dispose();
+    }
+  }
+
+  return { runChapter, dispose };
 }
 
-// 替换执行时，先结束旧作用域，再创建新作用域。
-currentScope.dispose();
-currentScope = createScope();
+// 读档替换执行时，先结束旧 Runner，再按存档流程恢复新执行。
+currentRunner.dispose();
+currentRunner = createRunner();
 ```
 
-先将 active 设为 false，使清理过程中或之后到达的回调失效；结束等待、取消订阅和停止动作，则使旧执行能够收尾。Promise 只接受第一次完成结果，已经完成的等待保持原结果，await 后的有效性检查仍会阻止旧流程继续。
+旧回调调用的仍是旧 Runner 内部的 onActionResult，检查的是旧 active；旧 gate 被取消结果唤醒后，也会在 await 后退出。新 Runner 有自己独立的 calls 和 active。
 
 清理范围取决于所有权：Runner 可以取消自己发起的移动、解除自己的任务订阅；任务系统和音频系统维护的持续状态，由各自的生命周期管理。
