@@ -1,0 +1,12 @@
+{
+  "id": "ai-overdefensive-coding",
+  "title": "AI 编码中的过度防御",
+  "updatedAt": "2026-11-17T15:26:35.567Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

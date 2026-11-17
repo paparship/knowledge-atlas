@@ -272,6 +272,14 @@
       "type": "parent-child",
       "label": "",
       "status": "draft"
+    },
+    {
+      "id": "ai-development-overdefensive",
+      "source": "ai-assisted-development",
+      "target": "ai-overdefensive-coding",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
     }
   ],
   "positions": {
