@@ -78,8 +78,23 @@ try {
   const saved=JSON.parse(localStorage.getItem('atlas-expanded-nodes')||'[]');
   if(Array.isArray(saved))for(const id of saved)if(typeof id==='string')expandedNodes.add(id);
 } catch {}
+function nodeUpdatedTime(node){return Date.parse(node.updatedAt)||0;}
+function compareRecentNodes(a,b){return nodeUpdatedTime(b)-nodeUpdatedTime(a)||a.id.localeCompare(b.id);}
+function sidebarActivity(items,edges){
+  const latest=new Map(items.map(n=>[n.id,nodeUpdatedTime(n)]));
+  const links=edges.filter(e=>e.type==='parent-child'&&latest.has(e.source)&&latest.has(e.target));
+  // Bubble descendant activity up without changing any node's saved timestamp.
+  for(let pass=0;pass<items.length;pass++){
+    let changed=false;
+    for(const e of links)if(latest.get(e.target)>latest.get(e.source)){
+      latest.set(e.source,latest.get(e.target));changed=true;
+    }
+    if(!changed)break;
+  }
+  return latest;
+}
 function renderList(){
-  const all=nodes(),items=visible();
+  const all=nodes(),items=visible().slice().sort(compareRecentNodes);
   $('#allCount').textContent=all.length;$('#draftCount').textContent=state.draft.length;$('#confirmedCount').textContent=state.confirmed.length;$('#listCount').textContent=items.length;
   $('#scopeTitle').textContent={all:'全部节点',draft:'未整理区',confirmed:'正式记录'}[filter];
   const button=n=>'<button class="node-item '+(n.id===selected?'active ':'')+(n.status==='confirmed'?'formal':'')+'" data-node="'+esc(n.id)+'"><span class="dot" role="img" aria-label="'+(n.status==='confirmed'?'已确认':'未整理')+'"></span><strong>'+esc(n.title)+'</strong></button>';
@@ -90,6 +105,8 @@ function renderList(){
     const eligibleIds=new Set(eligible.map(n=>n.id));
     const shown=new Map(items.map(n=>[n.id,n]));
     const edges=state.graph.edges.filter(e=>e.type==='parent-child'&&eligibleIds.has(e.source)&&eligibleIds.has(e.target));
+    const latest=sidebarActivity(eligible,edges);
+    const compareBranches=(a,b)=>latest.get(b)-latest.get(a)||a.localeCompare(b);
     // Keep matching nodes in their chapter context during search.
     let changed=true;
     while(changed){changed=false;for(const e of edges)if(shown.has(e.target)&&!shown.has(e.source)){shown.set(e.source,getNode(e.source));changed=true;}}
@@ -98,15 +115,15 @@ function renderList(){
     const visited=new Set(),searching=!!$('#search').value.trim();
     const branch=id=>{
       if(visited.has(id))return '';visited.add(id);
-      const n=shown.get(id),kids=(children.get(id)||[]).filter(k=>!visited.has(k));
+      const n=shown.get(id),kids=(children.get(id)||[]).filter(k=>!visited.has(k)).sort(compareBranches);
       const open=searching||expandedNodes.has(id);
       const toggle=kids.length?'<button class="tree-toggle" data-toggle="'+esc(id)+'" aria-label="'+(open?'收起':'展开')+esc(n.title)+'" aria-expanded="'+open+'">'+(open?'▾':'▸')+'</button>':'<span class="tree-spacer"></span>';
       // Walk collapsed branches too, so they are not rendered again as roots.
       const nested=kids.map(branch).join('');
       return '<li><div class="tree-row">'+toggle+button(n)+'</div>'+(nested?'<ul'+(open?'':' hidden')+'>'+nested+'</ul>':'')+'</li>';
     };
-    const roots=[...shown.keys()].filter(id=>!parent.has(id));
-    html='<ul class="node-tree">'+roots.map(branch).join('')+[...shown.keys()].filter(id=>!visited.has(id)).map(branch).join('')+'</ul>';
+    const roots=[...shown.keys()].filter(id=>!parent.has(id)).sort(compareBranches);
+    html='<ul class="node-tree">'+roots.map(branch).join('')+[...shown.keys()].filter(id=>!visited.has(id)).sort(compareBranches).map(branch).join('')+'</ul>';
   }
   $('#nodeList').innerHTML=items.length?html:'<p class="empty-list">还没有符合条件的节点。</p>';
   $('#graphStats').textContent=all.length+' 个节点 / '+state.graph.edges.length+' 条关联';
