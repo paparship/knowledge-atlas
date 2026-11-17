@@ -232,6 +232,46 @@
       "type": "parent-child",
       "label": "",
       "status": "draft"
+    },
+    {
+      "id": "ai-development-child-1",
+      "source": "ai-assisted-development",
+      "target": "traditional-to-ai-development",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "ai-development-child-2",
+      "source": "ai-assisted-development",
+      "target": "ai-development-trust-basis",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "ai-development-child-3",
+      "source": "ai-assisted-development",
+      "target": "test-driven-development",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "ai-development-child-4",
+      "source": "ai-assisted-development",
+      "target": "model-based-test-design",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "ai-development-child-5",
+      "source": "ai-assisted-development",
+      "target": "ai-development-layered-acceptance",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
     }
   ],
   "positions": {
