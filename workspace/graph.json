@@ -392,6 +392,14 @@
       "type": "parent-child",
       "label": "",
       "status": "draft"
+    },
+    {
+      "id": "web-typescript-static-types",
+      "source": "web-development",
+      "target": "typescript-static-types",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
     }
   ],
   "positions": {
