@@ -384,6 +384,14 @@
       "type": "parent-child",
       "label": "",
       "status": "draft"
+    },
+    {
+      "id": "web-vue-react-component-updates",
+      "source": "web-development",
+      "target": "vue-react-component-updates",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
     }
   ],
   "positions": {
