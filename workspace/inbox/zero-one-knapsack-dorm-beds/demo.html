@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<style>
+*{box-sizing:border-box}body{margin:0;padding:10px 12px;color:#17243a;background:#f8faff;font:13px/1.4 system-ui,sans-serif} 
+.controls{display:flex;gap:5px;flex-wrap:wrap;align-items:center}button{font:inherit;padding:3px 7px;border:1px solid #b2c2d9;background:white;color:inherit;border-radius:5px}button:disabled{opacity:.5}#play{background:#2852a4;color:white}#progress{font-variant-numeric:tabular-nums}
+#vars,#message,#legend{margin:6px 0}#message{min-height:2.8em;margin-bottom:4px}#legend{font-size:11px}#cells{display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:3px;max-width:580px}
+.cell{text-align:center;border:1px solid #c7d4e7;border-radius:4px;background:white;min-width:0;font-variant-numeric:tabular-nums}.cell small{display:block;color:#4a5d78;font-size:10px}.cell>span{display:block;font-weight:650}
+.cell.target{background:#fff1d7;border-color:#c47724}.cell.source{background:#dbeafe;border-color:#4168a9}.cell.write{background:#efe4ff;border-color:#7040aa}.cell.result{background:#dbeafe;border-color:#4168a9}
+#code{margin:0;padding:4px 0;background:white;border:1px solid #d3deed;border-radius:5px;overflow-x:auto;font:11.5px/1.36 ui-monospace,Consolas,monospace}.line{display:flex;min-height:1.36em;width:max-content;min-width:100%;white-space:pre;padding-right:7px}.number{width:2.25em;text-align:right;padding-right:.65em;color:#526581;user-select:none}.line.on{background:#e4edff;color:#16366e}.line.on .number{color:#16366e;font-weight:700}
+</style>
+<div class="controls"><button id="play">播放</button><button id="prev">上一步</button><button id="next">下一步</button><button id="reset">重置</button><span id="progress"></span></div>
+<div id="vars"></div>
+<div id="cells" aria-label="DP 数组"></div>
+<p id="legend">上排是容量 c，下排是 dp[c]。蓝色读剩余容量，橙色读当前值，紫色写回。</p>
+<div id="code" aria-label="Python 代码"></div>
+<p id="message" aria-live="polite"></p>
+<script>
+const code = "def max_occupied_beds(class_sizes, capacity=1000):\n    dp = [0] * (capacity + 1)\n\n    for size in class_sizes:\n        # 容量倒序，保证当前班只用一次\n        for c in range(capacity, size - 1, -1):\n            without = dp[c]\n            with_class = dp[c - size] + size\n            dp[c] = max(without, with_class)\n\n    return dp[capacity]";
+const capacity = 10;
+const sizes = [6, 5, 5];
+
+function trace() {
+  const frames = [];
+  let dp = null, classIndex = null, size = null, c = null;
+  let without = null, withClass = null;
+  function add(line, message, marks = {}) {
+    frames.push({ line, message, dp: dp?.slice(), classIndex, size, c, without, withClass, ...marks });
+  }
+  add(1, "调用函数。传入三个班的人数和 10 张床。");
+  dp = Array(capacity + 1).fill(0);
+  add(2, "创建容量 0 到 10 的 11 个格子。还没选任何班，因此全是 0。");
+  for (const [index, count] of sizes.entries()) {
+    classIndex = index + 1;
+    size = count;
+    c = without = withClass = null;
+    add(4, "开始处理第 " + classIndex + " 个班，有 " + size + " 人。");
+    for (let beds = capacity; beds >= size; beds--) {
+      c = beds;
+      without = withClass = null;
+      add(6, "本轮容量 c = " + c + "。当前班能放进来，开始比较两种方案。");
+      without = dp[c];
+      add(7, "不选这个班，读取 dp[" + c + "] = " + without + "。", { target: c });
+      const remaining = c - size;
+      withClass = dp[remaining] + size;
+      add(8, "选这个班，读取 dp[" + remaining + "] = " + dp[remaining] + "，再加 " + size + "，得到 " + withClass + "。", { source: remaining });
+      dp[c] = Math.max(without, withClass);
+      add(9, "写回 dp[" + c + "] = max(" + without + ", " + withClass + ") = " + dp[c] + (dp[c] === without ? "，保持原值。" : "。"), { write: c });
+    }
+    c = without = withClass = null;
+    add(6, "下一容量 " + (size - 1) + " 放不下这个班，结束本轮容量循环。");
+  }
+  classIndex = size = null;
+  add(4, "所有班均已处理，结束外层循环。");
+  add(11, "返回 dp[10] = " + dp[capacity] + "。两个 5 人班正好住满。", { result: capacity });
+  return frames;
+}
+
+const frames = trace();
+const get = id => document.getElementById(id);
+const play = get("play");
+const rows = code.split("\n").map((text, i) => {
+  const line = document.createElement("div");
+  const number = document.createElement("span");
+  number.className = "number";
+  number.textContent = i + 1;
+  const instruction = document.createElement("span");
+  instruction.textContent = text;
+  line.append(number, instruction);
+  get("code").append(line);
+  return line;
+});
+const cells = Array.from({ length: capacity + 1 }, (_, i) => {
+  const cell = document.createElement("div");
+  const index = document.createElement("small");
+  index.textContent = i;
+  const value = document.createElement("span");
+  cell.append(index, value);
+  get("cells").append(cell);
+  return { cell, value };
+});
+let step = 0, timer = null;
+
+function stop() {
+  if (timer !== null) clearInterval(timer);
+  timer = null;
+  play.textContent = "播放";
+}
+function render() {
+  const frame = frames[step];
+  get("progress").textContent = (step + 1) + " / " + frames.length;
+  const current = frame.classIndex === null ? "" : " · 当前班 " + frame.classIndex + "（" + frame.size + " 人）";
+  const cap = frame.c === null ? "" : " · c = " + frame.c;
+  get("vars").textContent = "床位 10 · 班级人数 [6, 5, 5]" + current + cap;
+  get("message").textContent = frame.message;
+  get("prev").disabled = step === 0;
+  get("next").disabled = step === frames.length - 1;
+  rows.forEach((row, i) => { row.className = "line" + (frame.line === i + 1 ? " on" : ""); });
+  cells.forEach(({cell, value}, i) => {
+    cell.className = ["cell", ...["target", "source", "write", "result"].filter(key => frame[key] === i)].join(" ");
+    value.textContent = frame.dp?.[i] ?? "·";
+  });
+}
+function move(delta) {
+  step = Math.max(0, Math.min(frames.length - 1, step + delta));
+  render();
+}
+play.onclick = () => {
+  if (timer !== null) { stop(); return; }
+  if (step === frames.length - 1) { step = 0; render(); }
+  play.textContent = "暂停";
+  timer = setInterval(() => {
+    move(1);
+    if (step === frames.length - 1) stop();
+  }, 520);
+};
+get("prev").onclick = () => { stop(); move(-1); };
+get("next").onclick = () => { stop(); move(1); };
+get("reset").onclick = () => { stop(); step = 0; render(); };
+render();
+</script>
+</html>
