@@ -1,0 +1,12 @@
+{
+  "id": "http-status-codes",
+  "title": "HTTP 常见状态码",
+  "updatedAt": "2026-11-18T05:47:44.586Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}
