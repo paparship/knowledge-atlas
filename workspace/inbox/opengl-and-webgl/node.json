@@ -1,0 +1,12 @@
+{
+  "id": "opengl-and-webgl",
+  "title": "OpenGL 与 WebGL",
+  "updatedAt": "2026-11-18T06:39:31.078Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}
