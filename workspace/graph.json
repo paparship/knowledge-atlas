@@ -376,6 +376,14 @@
       "type": "parent-child",
       "label": "",
       "status": "draft"
+    },
+    {
+      "id": "web-react-page-performance",
+      "source": "web-development",
+      "target": "react-page-performance",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
     }
   ],
   "positions": {
