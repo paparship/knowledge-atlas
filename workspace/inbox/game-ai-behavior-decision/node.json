@@ -1,0 +1,12 @@
+{
+  "id": "game-ai-behavior-decision",
+  "title": "游戏角色的行为决策",
+  "updatedAt": "2026-11-18T06:45:47.900Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}
