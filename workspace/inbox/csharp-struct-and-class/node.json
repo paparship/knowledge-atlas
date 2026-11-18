@@ -1,0 +1,12 @@
+{
+  "id": "csharp-struct-and-class",
+  "title": "C# 值类型与引用类型",
+  "updatedAt": "2026-11-18T05:53:14.830Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}
