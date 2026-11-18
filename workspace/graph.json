@@ -320,6 +320,14 @@
       "type": "related",
       "label": "多进程与单线程事件循环",
       "status": "draft"
+    },
+    {
+      "id": "threads-coroutines-js",
+      "source": "os-processes-and-threads",
+      "target": "coroutines-and-javascript-async",
+      "type": "related",
+      "label": "线程与协程的区别",
+      "status": "draft"
     }
   ],
   "positions": {
