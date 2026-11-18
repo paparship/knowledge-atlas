@@ -344,6 +344,14 @@
       "type": "parent-child",
       "label": "",
       "status": "draft"
+    },
+    {
+      "id": "web-react-useeffect",
+      "source": "web-development",
+      "target": "react-useeffect",
+      "type": "parent-child",
+      "status": "draft",
+      "label": ""
     }
   ],
   "positions": {
