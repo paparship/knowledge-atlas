@@ -360,6 +360,14 @@
       "type": "parent-child",
       "status": "draft",
       "label": ""
+    },
+    {
+      "id": "web-react-props-shared-state",
+      "source": "web-development",
+      "target": "react-props-shared-state",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
     }
   ],
   "positions": {

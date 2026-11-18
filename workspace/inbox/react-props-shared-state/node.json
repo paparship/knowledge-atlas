@@ -1,0 +1,12 @@
+{
+  "id": "react-props-shared-state",
+  "title": "React 组件传值与状态提升",
+  "updatedAt": "2026-11-18T16:54:16.952Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}
