@@ -1,0 +1,12 @@
+{
+  "id": "hash-set-mutual-receipts",
+  "title": "用哈希集合统计双向回执",
+  "updatedAt": "2026-11-18T06:47:53.025Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

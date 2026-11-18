@@ -1,0 +1,12 @@
+{
+  "id": "stack-sequence-stabilization",
+  "title": "用栈维护稳定序列",
+  "updatedAt": "2026-11-18T06:47:53.109Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}
