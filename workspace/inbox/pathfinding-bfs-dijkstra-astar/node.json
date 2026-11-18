@@ -1,0 +1,17 @@
+{
+  "id": "pathfinding-bfs-dijkstra-astar",
+  "title": "常用寻路算法：BFS、Dijkstra 与 A*",
+  "updatedAt": "2026-11-18T06:17:36.617Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    },
+    {
+      "id": "demo",
+      "format": "html",
+      "file": "demo.html"
+    }
+  ]
+}

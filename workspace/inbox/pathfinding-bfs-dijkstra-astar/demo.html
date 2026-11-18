@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<style>
+*{box-sizing:border-box}body{margin:0;padding:14px;font:14px/1.45 system-ui,sans-serif;color:#1e293b;background:#f8faff}
+.controls,.legend{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+button,select{font:inherit;border:1px solid #aebdd1;border-radius:6px;background:white;color:inherit;padding:5px 8px}button:disabled{opacity:.45}
+#play{background:#234fa8;color:white;border-color:#234fa8}
+#rule,#status{margin:8px 0}.map{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:3px;max-width:420px}
+.cell{display:grid;place-items:center;aspect-ratio:1.35;max-height:39px;min-width:0;border:1px solid #c6d3e5;border-radius:4px;background:#fff;font-weight:700}
+.wall{background:#475569;color:white}.mud{background:#fff0ce}.frontier{background:#dbeafe;color:#172554}.closed{background:#305798;color:white}.path{background:#6235a3;color:white}.current{outline:2px solid #c45112;outline-offset:-2px}
+.legend{margin-top:9px;font-size:12px}.swatch{display:inline-block;width:13px;height:13px;vertical-align:-2px;border:1px solid #aebdd1;border-radius:3px;margin-right:4px}
+</style>
+<div class="controls">
+  <label for="algorithm">算法</label>
+  <select id="algorithm"><option>BFS</option><option>Dijkstra</option><option>A*</option></select>
+  <button id="play">播放</button><button id="prev">上一步</button><button id="next">下一步</button><button id="reset">重置</button>
+</div>
+<p id="rule"></p>
+<div class="map" id="map" role="img" aria-label="寻路格子地图"></div>
+<div class="legend"><span>S 起点 · G 终点</span><span><i class="swatch mud"></i>泥地（代价 5）</span><span><i class="swatch frontier"></i>待扩展</span><span><i class="swatch closed"></i>已处理</span><span><i class="swatch current"></i>当前</span><span><i class="swatch path"></i>结果</span></div>
+<p id="status" aria-live="polite"></p>
+<script>
+const grid = [".........", "..#...#..", ".SMMMMMG.", ".........", ".###.....", "........."];
+const cols = grid[0].length;
+const tiles = grid.join("").split("");
+const start = tiles.indexOf("S");
+const goal = tiles.indexOf("G");
+const row = id => Math.floor(id / cols);
+const col = id => id % cols;
+const cost = id => tiles[id] === "M" ? 5 : 1;
+const distance = id => Math.abs(row(id) - row(goal)) + Math.abs(col(id) - col(goal));
+const directions = [[-1, 0], [0, 1], [1, 0], [0, -1]];
+function neighbors(id) {
+  const result = [];
+  for (const [dr, dc] of directions) {
+    const r = row(id) + dr, c = col(id) + dc;
+    if (r >= 0 && r < grid.length && c >= 0 && c < cols && grid[r][c] !== "#") {
+      result.push(r * cols + c);
+    }
+  }
+  return result;
+}
+function simulate(mode) {
+  const estimate = mode === "A*" ? distance : () => 0;
+  const pending = [{ id: start, g: 0, priority: estimate(start) }];
+  const best = new Map([[start, 0]]);
+  const parent = new Map([[start, null]]);
+  const closed = new Set();
+  const frames = [];
+  function snapshot(current = null, path = []) {
+    const frontier = pending.filter(item => item.g === best.get(item.id)).map(item => item.id);
+    frames.push({ current, path, frontier, closed: [...closed], g: current?.g });
+  }
+  snapshot();
+  while (pending.length) {
+    // 小地图直接排序，出队顺序与 Python 最小堆相同。
+    if (mode !== "BFS") pending.sort((a, b) => a.priority - b.priority || a.g - b.g || a.id - b.id);
+    const current = pending.shift();
+    if (current.g !== best.get(current.id)) continue;
+    closed.add(current.id);
+    if (current.id === goal) {
+      const path = [];
+      for (let id = goal; id !== null; id = parent.get(id)) path.unshift(id);
+      snapshot(current, path);
+      break;
+    }
+    for (const id of neighbors(current.id)) {
+      const g = current.g + (mode === "BFS" ? 1 : cost(id));
+      if (best.has(id) && g >= best.get(id)) continue;
+      best.set(id, g);
+      parent.set(id, current.id);
+      pending.push({ id, g, priority: g + estimate(id) });
+    }
+    snapshot(current);
+  }
+  return frames;
+}
+const $ = id => document.getElementById(id);
+const algorithm = $("algorithm"), play = $("play"), prev = $("prev"), next = $("next");
+const cells = tiles.map(tile => {
+  const el = document.createElement("div");
+  el.className = "cell";
+  el.textContent = tile === "#" ? "" : tile === "M" ? "5" : tile === "." ? "" : tile;
+  $("map").append(el);
+  return el;
+});
+const rules = {
+  BFS: "按步数由少到多扩展，每步都按 1 计。",
+  Dijkstra: "优先扩展从起点走来实际代价 g 最小的格子。",
+  "A*": "优先扩展 g + h 最小的格子，h 是到终点的曼哈顿距离。"
+};
+let frames, step, timer;
+function stop() {
+  clearInterval(timer);
+  timer = null;
+  play.textContent = "播放";
+}
+function render() {
+  const frame = frames[step];
+  cells.forEach((cell, id) => {
+    cell.className = ["cell", tiles[id] === "#" && "wall", tiles[id] === "M" && "mud",
+      frame.frontier.includes(id) && "frontier", frame.closed.includes(id) && "closed",
+      frame.path.includes(id) && "path", frame.current?.id === id && "current"].filter(Boolean).join(" ");
+  });
+  prev.disabled = step === 0;
+  next.disabled = step === frames.length - 1;
+  $("rule").textContent = rules[algorithm.value];
+  if (frame.path.length) {
+    const total = frame.path.slice(1).reduce((sum, id) => sum + cost(id), 0);
+    $("status").textContent = "找到路径 · " + (frame.path.length - 1) + " 步 · 地形总代价 " + total + " · 已处理 " + step + " 格（含终点）";
+  } else if (frame.current) {
+    const id = frame.current.id;
+    const score = algorithm.value === "BFS" ? "步数 " + frame.g : "g = " + frame.g;
+    const extra = algorithm.value === "A*" ? "，h = " + distance(id) + "，g + h = " + (frame.g + distance(id)) : "";
+    $("status").textContent = "第 " + step + " 步 · 当前格 (" + row(id) + ", " + col(id) + ") · " + score + extra;
+  } else $("status").textContent = "从 S 开始，点击播放或下一步。";
+}
+function reset() {
+  stop();
+  frames = simulate(algorithm.value);
+  step = 0;
+  render();
+}
+function move(offset) {
+  step = Math.max(0, Math.min(frames.length - 1, step + offset));
+  render();
+}
+play.onclick = () => {
+  if (timer) { stop(); return; }
+  if (step === frames.length - 1) reset();
+  play.textContent = "暂停";
+  timer = setInterval(() => {
+    move(1);
+    if (step === frames.length - 1) stop();
+  }, 280);
+};
+prev.onclick = () => { stop(); move(-1); };
+next.onclick = () => { stop(); move(1); };
+$("reset").onclick = reset;
+algorithm.onchange = reset;
+reset();
+</script>
+</html>
