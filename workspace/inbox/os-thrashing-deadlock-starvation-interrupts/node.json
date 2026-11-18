@@ -1,0 +1,12 @@
+{
+  "id": "os-thrashing-deadlock-starvation-interrupts",
+  "title": "操作系统中的抖动、死锁、饥饿与中断嵌套",
+  "updatedAt": "2026-11-18T05:57:11.402Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}
