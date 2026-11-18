@@ -1,0 +1,12 @@
+{
+  "id": "nginx-web-server-and-concurrency",
+  "title": "NGINX 的职责与并发模型",
+  "updatedAt": "2026-11-18T06:08:57.222Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

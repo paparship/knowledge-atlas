@@ -296,6 +296,30 @@
       "type": "parent-child",
       "label": "",
       "status": "draft"
+    },
+    {
+      "id": "web-development-nginx",
+      "source": "web-development",
+      "target": "nginx-web-server-and-concurrency",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "process-thread-redis-execution",
+      "source": "os-processes-and-threads",
+      "target": "redis-command-execution",
+      "type": "related",
+      "label": "单线程执行与锁开销",
+      "status": "draft"
+    },
+    {
+      "id": "process-thread-nginx-workers",
+      "source": "os-processes-and-threads",
+      "target": "nginx-web-server-and-concurrency",
+      "type": "related",
+      "label": "多进程与单线程事件循环",
+      "status": "draft"
     }
   ],
   "positions": {
