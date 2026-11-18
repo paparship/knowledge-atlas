@@ -38,7 +38,7 @@ React 是一个用 JavaScript 构建界面的库。组件函数根据当前数�
 
 `createRoot` 指定 React 管理哪块页面，`root.render` 把 `Counter` 渲染进去。组件里的 `createElement("button", …)` 描述按钮的类型、点击事件和文字，React 根据它在 DOM 中创建真正的按钮。
 
-## useState 保存组件的状态
+## React 组件怎么渲染？调用 setState 后为什么马上读到的还是旧值？
 
 `const [count, setCount] = useState(0)` 拿到的是一对值：
 
