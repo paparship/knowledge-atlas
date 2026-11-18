@@ -352,6 +352,14 @@
       "type": "parent-child",
       "status": "draft",
       "label": ""
+    },
+    {
+      "id": "web-react-timer-closure",
+      "source": "web-development",
+      "target": "react-timer-closure",
+      "type": "parent-child",
+      "status": "draft",
+      "label": ""
     }
   ],
   "positions": {

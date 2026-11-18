@@ -1,0 +1,91 @@
+<style>
+*{box-sizing:border-box}body{margin:0;padding:12px;color:#20304a;font:14px/1.5 system-ui,sans-serif;background:#fff}section{border:1px solid #cfd9e8;border-radius:8px;padding:10px;margin-bottom:8px}h3{font-size:14px;margin:0 0 6px}button{font:inherit;border:1px solid #adbed5;border-radius:5px;background:white;padding:4px 10px;cursor:pointer}button:disabled{opacity:.47;cursor:default}button:focus-visible{outline:2px solid #225aca}#next:enabled{background:#2357b3;color:white}#preview{display:flex;align-items:center;flex-wrap:wrap;gap:7px}#value{font-size:20px;font-weight:700;margin-right:4px}#src{background:#f6f8fc;border-radius:6px;overflow-x:auto;padding:6px 0;margin:0}.line{display:block;min-width:max-content;white-space:pre;font:13px/1.55 Consolas,monospace;padding-right:8px}.line:before{content:attr(data-line);display:inline-block;width:23px;text-align:right;margin-right:9px;color:#78849a}.active{background:#dbe8ff;box-shadow:inset 3px 0 #255bb8}.kw{color:#763cb0}.fn{color:#135ba1}.num{color:#a64822}#msg{min-height:2.7em;margin:6px 0}#scope,#log{font-family:system-ui,sans-serif}footer{display:flex;gap:8px;flex-wrap:wrap}.readout{margin:3px 0}
+</style>
+<section><h3>页面预览</h3><div id="preview"><span id="value">尚未挂载</span><button id="schedule" disabled>3 秒后打印</button><button id="add" disabled>加 1</button></div></section>
+<pre id="src"></pre>
+<p id="msg" aria-live="polite"></p>
+<footer><button id="next">下一步</button><button id="advance">推进 3 秒</button><button id="reset">重来</button></footer>
+<section style="margin-top:10px"><div class="readout" id="scope"></div><div class="readout" id="timer"></div><div class="readout" id="log"></div></section>
+<script>
+const $ = id => document.getElementById(id);
+const lines = [
+  'function Counter() {',
+  '  const [count, setCount] = useState(0);',
+  '  function printLater() {',
+  '    setTimeout(() => {',
+  '      console.log(count);',
+  '    }, 3000);',
+  '  }',
+  '  function add() {',
+  '    setCount(n => n + 1);',
+  '  }',
+  '  return <div>',
+  '    <span>{count}</span>',
+  '    <button onClick={printLater}>3 秒后打印</button>',
+  '    <button onClick={add}>加 1</button>',
+  '  </div>;',
+  '}'
+];
+lines.forEach((line,i)=>{
+  const row=document.createElement('span');
+  row.className='line';row.dataset.line=i+1;
+  for(const word of line.split(/(\b(?:function|const|return|Counter|useState|setCount|setTimeout|printLater|console|log|add|\d+)\b)/)){
+    const token=document.createElement('span');token.textContent=word;
+    if(/^(function|const|return)$/.test(word))token.className='kw';
+    else if(/^\d+$/.test(word))token.className='num';
+    else if(/^[A-Za-z]+$/.test(word))token.className='fn';
+    row.append(token);
+  }
+  $('src').append(row);
+});
+let queue,state,renderNo,mounted,current,pending,outputs;
+function step(line,message,action=()=>{}){queue.push(()=>{action();show(line,message);});}
+function show(line,message){
+  Array.from($('src').children).forEach((el,i)=>el.classList.toggle('active',i+1===line));
+  $('msg').textContent=message;
+  $('scope').textContent='本次调用　'+(current?'第 '+current.id+' 次 Counter()，count = '+current.count:'尚未读取 count');
+  $('timer').textContent='定时器　'+(pending?'回调引用第 '+pending.id+' 次调用的 count':'无等待中的回调');
+  $('log').textContent='控制台　'+(outputs.length?outputs.join('，'):'尚无输出');
+  $('next').disabled=!queue.length;
+  const ready=mounted&&!queue.length;
+  $('add').disabled=!ready;
+  $('schedule').disabled=!ready||!!pending;
+  $('advance').disabled=!ready||!pending;
+}
+function next(){if(queue.length)queue.shift()();}
+function renderSteps(){
+  step(1,'React 调用同一个 Counter 函数。',()=>{renderNo++;current=null;});
+  step(2,'useState 把组件当前保存的状态交给这一次调用的局部变量 count。',()=>{
+    const count=state, id=renderNo;
+    current={id,count,print:()=>count};
+  });
+  step(11,'这次调用返回界面描述；两个按钮使用这一次调用里定义的处理函数。');
+  step(12,'React 把这次的 count 显示到页面。'+(pending?' 可以继续加 1，或点「推进 3 秒」执行先前的回调。':' 点页面上的「3 秒后打印」。'),()=>{
+    mounted=true;$('value').textContent='计数 '+current.count;
+  });
+}
+function reset(){
+  queue=[];state=0;renderNo=0;mounted=false;current=null;pending=null;outputs=[];
+  $('value').textContent='尚未挂载';renderSteps();show(0,'点「下一步」开始，观察第一次调用 Counter()。');
+}
+$('next').onclick=next;
+$('reset').onclick=reset;
+$('schedule').onclick=()=>{
+  const owner=current;
+  step(3,'你点了「3 秒后打印」，进入这个按钮的 printLater 函数。');
+  step(4,'定时器保存回调。现在点页面上的「加 1」，先让组件重新渲染。',()=>{pending=owner;});
+  next();
+};
+$('add').onclick=()=>{
+  step(8,'你点了「加 1」，进入 add 函数。');
+  step(9,'setCount 排入一次更新，下一次渲染会取得加 1 后的状态。',()=>{state++;});
+  renderSteps();next();
+};
+$('advance').onclick=()=>{
+  const owner=pending;
+  step(5,'时间到，浏览器执行已登记的回调。它读取第 '+owner.id+' 次调用里的 count，打印 '+owner.count+'；页面显示 '+current.count+'。',()=>{
+    outputs.push(owner.print());pending=null;
+  });next();
+};
+reset();
+</script>

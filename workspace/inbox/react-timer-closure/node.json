@@ -1,0 +1,17 @@
+{
+  "id": "react-timer-closure",
+  "title": "React 定时器回调与状态闭包",
+  "updatedAt": "2026-11-18T16:45:37.226Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    },
+    {
+      "id": "debugger",
+      "format": "html",
+      "file": "debugger.html"
+    }
+  ]
+}
