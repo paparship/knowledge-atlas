@@ -1,0 +1,12 @@
+{
+  "id": "cpp-stl-containers",
+  "title": "C++ STL 常用容器",
+  "updatedAt": "2026-11-18T05:30:19.435Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}
