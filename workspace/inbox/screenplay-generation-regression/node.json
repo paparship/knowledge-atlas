@@ -1,0 +1,12 @@
+{
+  "id": "screenplay-generation-regression",
+  "title": "剧本生成质量的回归评估",
+  "updatedAt": "2026-11-19T05:41:43.375Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

@@ -416,6 +416,14 @@
       "type": "related",
       "label": "DSL 校验与修复",
       "status": "draft"
+    },
+    {
+      "id": "screenplay-repair-regression",
+      "source": "screenplay-generation-repair",
+      "target": "screenplay-generation-regression",
+      "type": "related",
+      "label": "生成规则变更后的回归评估",
+      "status": "draft"
     }
   ],
   "positions": {
