@@ -408,6 +408,14 @@
       "type": "related",
       "label": "编译产物的执行模型",
       "status": "draft"
+    },
+    {
+      "id": "screenplay-dsl-generation-repair",
+      "source": "screenplay-intermediate-representation",
+      "target": "screenplay-generation-repair",
+      "type": "related",
+      "label": "DSL 校验与修复",
+      "status": "draft"
     }
   ],
   "positions": {
