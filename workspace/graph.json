@@ -400,6 +400,14 @@
       "type": "parent-child",
       "label": "",
       "status": "draft"
+    },
+    {
+      "id": "screenplay-ir-runtime-model",
+      "source": "screenplay-intermediate-representation",
+      "target": "rpg-data-driven-story",
+      "type": "related",
+      "label": "编译产物的执行模型",
+      "status": "draft"
     }
   ],
   "positions": {
