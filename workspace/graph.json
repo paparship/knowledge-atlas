@@ -424,6 +424,14 @@
       "type": "related",
       "label": "生成规则变更后的回归评估",
       "status": "draft"
+    },
+    {
+      "id": "time-complexity-knapsack",
+      "source": "algorithm-time-complexity",
+      "target": "zero-one-knapsack-dorm-beds",
+      "type": "related",
+      "label": "嵌套循环的复杂度分析",
+      "status": "draft"
     }
   ],
   "positions": {
