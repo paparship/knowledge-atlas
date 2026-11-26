@@ -1,0 +1,12 @@
+{
+  "id": "game-main-loop-input",
+  "title": "玩家输入",
+  "updatedAt": "2026-11-26T04:53:45.625Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

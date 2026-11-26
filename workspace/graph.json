@@ -440,6 +440,70 @@
       "type": "related",
       "label": "进程的地址空间",
       "status": "draft"
+    },
+    {
+      "id": "loop-child-input",
+      "source": "game-main-loop",
+      "target": "game-main-loop-input",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "loop-child-time",
+      "source": "game-main-loop",
+      "target": "game-main-loop-time",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "loop-child-logic",
+      "source": "game-main-loop",
+      "target": "game-main-loop-logic",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "loop-child-physics",
+      "source": "game-main-loop",
+      "target": "game-main-loop-physics",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "loop-child-animation",
+      "source": "game-main-loop",
+      "target": "game-main-loop-animation",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "loop-child-ui",
+      "source": "game-main-loop",
+      "target": "game-main-loop-ui",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "loop-child-render",
+      "source": "game-main-loop",
+      "target": "game-main-loop-render",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
+    },
+    {
+      "id": "loop-child-present",
+      "source": "game-main-loop",
+      "target": "game-main-loop-present",
+      "type": "parent-child",
+      "label": "",
+      "status": "draft"
     }
   ],
   "positions": {

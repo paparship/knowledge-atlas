@@ -1,0 +1,12 @@
+{
+  "id": "game-main-loop-render",
+  "title": "渲染",
+  "updatedAt": "2026-11-26T04:53:46.157Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

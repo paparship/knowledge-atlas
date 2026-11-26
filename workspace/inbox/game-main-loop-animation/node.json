@@ -1,0 +1,12 @@
+{
+  "id": "game-main-loop-animation",
+  "title": "动画更新",
+  "updatedAt": "2026-11-26T04:53:45.984Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

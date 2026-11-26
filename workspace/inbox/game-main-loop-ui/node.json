@@ -1,0 +1,12 @@
+{
+  "id": "game-main-loop-ui",
+  "title": "表现与 UI 更新",
+  "updatedAt": "2026-11-26T04:53:46.071Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

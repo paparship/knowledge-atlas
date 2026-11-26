@@ -1,0 +1,12 @@
+{
+  "id": "game-main-loop-physics",
+  "title": "物理与碰撞",
+  "updatedAt": "2026-11-26T04:53:45.895Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

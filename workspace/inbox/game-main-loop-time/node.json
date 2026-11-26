@@ -1,0 +1,12 @@
+{
+  "id": "game-main-loop-time",
+  "title": "时间步进",
+  "updatedAt": "2026-11-26T04:53:45.708Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

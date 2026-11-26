@@ -1,0 +1,12 @@
+{
+  "id": "game-main-loop-logic",
+  "title": "游戏逻辑更新",
+  "updatedAt": "2026-11-26T04:53:45.808Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}
