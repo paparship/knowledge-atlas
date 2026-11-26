@@ -1,0 +1,12 @@
+{
+  "id": "minigame-wasm-code-splitting",
+  "title": "小游戏的 WASM 代码分包",
+  "updatedAt": "2026-11-26T04:54:48.321Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

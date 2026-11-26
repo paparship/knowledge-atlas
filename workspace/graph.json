@@ -504,6 +504,22 @@
       "type": "parent-child",
       "label": "",
       "status": "draft"
+    },
+    {
+      "id": "unity-performance-tools-to-game-main-loop",
+      "source": "unity-performance-tools",
+      "target": "game-main-loop",
+      "type": "related",
+      "label": "逐帧分析",
+      "status": "draft"
+    },
+    {
+      "id": "unity-performance-tools-to-minigame-wasm-code-splitting",
+      "source": "unity-performance-tools",
+      "target": "minigame-wasm-code-splitting",
+      "type": "related",
+      "label": "启动性能优化",
+      "status": "draft"
     }
   ],
   "positions": {
