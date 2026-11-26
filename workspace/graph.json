@@ -432,6 +432,14 @@
       "type": "related",
       "label": "嵌套循环的复杂度分析",
       "status": "draft"
+    },
+    {
+      "id": "processes-virtual-address-space",
+      "source": "os-processes-and-threads",
+      "target": "process-virtual-address-space",
+      "type": "related",
+      "label": "进程的地址空间",
+      "status": "draft"
     }
   ],
   "positions": {
