@@ -1,0 +1,12 @@
+{
+  "id": "cpp-memory-ownership-crash",
+  "title": "C++ 内存泄漏与非法访问排查",
+  "updatedAt": "2026-11-26T04:56:36.164Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

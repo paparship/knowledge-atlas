@@ -1,0 +1,12 @@
+{
+  "id": "gc-frame-time",
+  "title": "垃圾回收与帧耗时",
+  "updatedAt": "2026-11-26T04:56:36.064Z",
+  "blocks": [
+    {
+      "id": "note",
+      "format": "markdown",
+      "file": "note.md"
+    }
+  ]
+}

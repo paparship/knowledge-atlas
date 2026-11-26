@@ -520,6 +520,22 @@
       "type": "related",
       "label": "启动性能优化",
       "status": "draft"
+    },
+    {
+      "id": "performance-to-gc-frame-time",
+      "source": "unity-performance-tools",
+      "target": "gc-frame-time",
+      "type": "related",
+      "label": "定位回收引起的慢帧",
+      "status": "draft"
+    },
+    {
+      "id": "performance-to-cpp-memory-ownership-crash",
+      "source": "unity-performance-tools",
+      "target": "cpp-memory-ownership-crash",
+      "type": "related",
+      "label": "定位未释放的对象",
+      "status": "draft"
     }
   ],
   "positions": {
